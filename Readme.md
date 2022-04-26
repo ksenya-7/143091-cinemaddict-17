@@ -1,7 +1,7 @@
 # Проект «Киноман»
 
 * Студент: [Ксения Кужель](https://up.htmlacademy.ru/ecmascript/17/user/143091).
-* Наставник: `Неизвестно`.
+* Наставник: [Rail Sakhaviev](https://htmlacademy.ru/profile/id1331891).
 
 ---
 
