@@ -17,19 +17,6 @@ const generateDate = () => {
   return dates[randomIndex];
 };
 
-// const generateId = () => {
-//   const ids = [
-//     '1',
-//     '2',
-//     '3',
-//     '4',
-//   ];
-
-//   const randomIndex = getRandomInteger(0, ids.length - 1);
-
-//   return ids[randomIndex];
-// };
-
 const generateAuthor = () => {
   const authors = [
     'Ilya O\u0027Reilly',
