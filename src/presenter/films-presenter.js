@@ -49,16 +49,16 @@ export default class FilmsPresenter {
       // filmDetailComponent.removeElement();
     };
 
-    const onEscKeyDown = (evt) => {
-      const popup = siteBodyElement.querySelector('.film-details');
-      // console.log(popup);
-      if (evt.key === 'Escape' || evt.key === 'Esc') {
-        evt.preventDefault();
-        popup.remove();
+    // const onEscKeyDown = (evt) => {
+    //   const popup = siteBodyElement.querySelector('.film-details');
+    //   // console.log(popup);
+    //   if (evt.key === 'Escape' || evt.key === 'Esc') {
+    //     evt.preventDefault();
+    //     popup.remove();
 
-        document.removeEventListener('keydown', onEscKeyDown);
-      }
-    };
+    //     document.removeEventListener('keydown', onEscKeyDown);
+    //   }
+    // };
 
     filmComponent.element.addEventListener('click', () => {
       openFilmDetail();
@@ -73,7 +73,19 @@ export default class FilmsPresenter {
         });
       });
 
-      document.addEventListener('keydown', onEscKeyDown);
+      document.addEventListener('keydown', (evt) => {
+        if (evt.key === 'Escape' || evt.key === 'Esc') {
+          evt.preventDefault();
+          popup.remove();
+
+          document.removeEventListener('keydown', () => {
+            if (evt.key === 'Escape' || evt.key === 'Esc') {
+              evt.preventDefault();
+              popup.remove();
+            }
+          });
+        }
+      });
     });
 
     render(filmComponent, this.#filmsСontainerComponent.element);
