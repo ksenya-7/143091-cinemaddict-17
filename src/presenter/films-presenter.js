@@ -36,14 +36,16 @@ export default class FilmsPresenter {
     const filmComponent = new FilmCardView(film);
     const siteBodyElement = document.querySelector('body');
 
-    const filmDetailComponent = new FilmDetailsView(film);
+    // const filmDetailComponent = new FilmDetailsView(film);
 
     const openFilmDetail = () => {
+      const filmDetailComponent = new FilmDetailsView(film);
+
       render(filmDetailComponent, siteBodyElement);
     };
 
     const closeFilmDetail = (popup) => {
-      popup.remove(filmDetailComponent.element);
+      popup.remove();
       // filmDetailComponent.removeElement();
     };
 
@@ -51,7 +53,8 @@ export default class FilmsPresenter {
       if (evt.key === 'Escape' || evt.key === 'Esc') {
         evt.preventDefault();
         const popup = siteBodyElement.querySelector('.film-details');
-        closeFilmDetail(popup);
+        // closeFilmDetail(popup);
+        popup.remove();
 
         document.removeEventListener('keydown', onEscKeyDown);
       }
@@ -61,9 +64,9 @@ export default class FilmsPresenter {
       openFilmDetail();
       const button = siteBodyElement.querySelector('.film-details__close-btn');
       // console.log(button);
+      const popup = siteBodyElement.querySelector('.film-details');
 
       button.addEventListener('click', () => {
-        const popup = siteBodyElement.querySelector('.film-details');
         // console.log(popup);
         closeFilmDetail(popup);
         button.removeEventListener('click', () => {
@@ -73,7 +76,6 @@ export default class FilmsPresenter {
 
       document.addEventListener('keydown', onEscKeyDown);
     });
-
 
     render(filmComponent, this.#filmsСontainerComponent.element);
   };
