@@ -36,24 +36,24 @@ export default class FilmsPresenter {
     const filmComponent = new FilmCardView(film);
     const siteBodyElement = document.querySelector('body');
 
-    // const filmDetailComponent = new FilmDetailsView(film);
-
     const openFilmDetail = () => {
       const filmDetailComponent = new FilmDetailsView(film);
 
       render(filmDetailComponent, siteBodyElement);
+      siteBodyElement.classList.add('hide-overflow');
     };
 
     const closeFilmDetail = (popup) => {
       popup.remove();
+      siteBodyElement.classList.remove('hide-overflow');
       // filmDetailComponent.removeElement();
     };
 
     const onEscKeyDown = (evt) => {
+      const popup = siteBodyElement.querySelector('.film-details');
+      // console.log(popup);
       if (evt.key === 'Escape' || evt.key === 'Esc') {
         evt.preventDefault();
-        const popup = siteBodyElement.querySelector('.film-details');
-        // closeFilmDetail(popup);
         popup.remove();
 
         document.removeEventListener('keydown', onEscKeyDown);
@@ -63,7 +63,6 @@ export default class FilmsPresenter {
     filmComponent.element.addEventListener('click', () => {
       openFilmDetail();
       const button = siteBodyElement.querySelector('.film-details__close-btn');
-      // console.log(button);
       const popup = siteBodyElement.querySelector('.film-details');
 
       button.addEventListener('click', () => {
