@@ -57,6 +57,9 @@ export default class FilmsPresenter {
     };
 
     filmComponent.element.addEventListener('click', () => {
+      if (siteBodyElement.querySelector('.film-details')) {
+        return;
+      }
       openFilmDetail();
       const button = siteBodyElement.querySelector('.film-details__close-btn');
       const popup = siteBodyElement.querySelector('.film-details');
