@@ -46,7 +46,6 @@ export default class FilmsPresenter {
     const closeFilmDetail = (popup) => {
       popup.remove();
       siteBodyElement.classList.remove('hide-overflow');
-      // filmDetailComponent.removeElement();
     };
 
     const onEscKeyDown = (evt, popup) => {
@@ -71,6 +70,19 @@ export default class FilmsPresenter {
 
       document.addEventListener('keydown', (evt) => {
         onEscKeyDown(evt, popup);
+      });
+
+      document.addEventListener('click', () => {
+        if (!popup) {
+          return;
+        }
+
+        document.addEventListener('click', (event) => {
+          const click = event.composedPath().includes(popup);
+          if (!click) {
+            closeFilmDetail(popup);
+          }
+        });
       });
     });
 
