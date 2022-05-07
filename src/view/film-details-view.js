@@ -190,6 +190,10 @@ export default class FilmDetailsView {
     return this.#element;
   }
 
+  get closeButton() {
+    return this.element.querySelector('.film-details__close-btn');
+  }
+
   removeElement() {
     this.#element = null;
   }

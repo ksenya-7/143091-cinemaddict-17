@@ -1,6 +1,5 @@
 import ProfileButtonView from './view/profile-button-view.js';
 import MainNavigationView from './view/main-navigation-view.js';
-import SortView from './view/sort-view.js';
 import StatisticsView from './view/statistics-view.js';
 import FilmsPresenter from './presenter/films-presenter.js';
 import {render} from './render.js';
@@ -15,7 +14,6 @@ const filmsModel = new FilmsModel();
 
 render(new ProfileButtonView(), siteHeaderElement);
 render(new MainNavigationView(), siteMainElement);
-render(new SortView(), siteMainElement);
 render(new StatisticsView(), siteFooterElement);
 
 filmsPresenter.init(siteMainElement, filmsModel);
