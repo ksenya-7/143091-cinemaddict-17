@@ -10,6 +10,7 @@ const siteMainElement = siteBodyElement.querySelector('.main');
 const siteHeaderElement = siteBodyElement.querySelector('.header');
 const siteFooterElement = siteBodyElement.querySelector('.footer__statistics');
 const filmsModel = new FilmsModel();
+
 const filmsPresenter = new FilmsPresenter(siteMainElement, filmsModel);
 
 render(new ProfileButtonView(), siteHeaderElement);
