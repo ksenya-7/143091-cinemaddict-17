@@ -50,33 +50,24 @@ const createEmotionsTemplate = () => EMOTIONS.map((el) => (
 
 const createFilmDetailsTemplate = (film) => {
   const filmInfo = film['film_info'];
-  const title = filmInfo['title'];
-  const titleOriginal = filmInfo['alternative_title'];
-  const rating = filmInfo['total_rating'];
-  const releaseDate = filmInfo['release']['date'];
-  const releaseCountry = filmInfo['release']['release_country'];
-  const runtime = getTimeFromMins(filmInfo['runtime']);
-  const genre = filmInfo['genre'];
-  const poster = filmInfo['poster'];
-  const description = filmInfo['description'];
-  const ageRating = filmInfo['age_rating'];
-  const director = filmInfo['director'];
-  const writers = filmInfo['writers'];
-  const actors = filmInfo['actors'];
 
-  const comments = film['comments'];
+  const releaseDate = filmInfo['release']['date'];
   const releaseFullDate = humanizeFilmReleaseDate(releaseDate);
 
+  const runtime = getTimeFromMins(filmInfo['runtime']);
+
+  const genre = filmInfo['genre'];
+  const genresTemplate = createGenresTemplate(genre);
+
+  const comments = film['comments'];
+  const commentsTemplate = createCommentsTemplate(comments);
+
   const userDetails = film['user_details'];
-
   const isWatched = userDetails['already_watched'];
-
   const watchedClassName = isWatched
     ? 'film-details__control-button--active'
     : '';
 
-  const genresTemplate = createGenresTemplate(genre);
-  const commentsTemplate = createCommentsTemplate(comments);
   const emotionsTemplate = createEmotionsTemplate();
 
   return (
@@ -88,35 +79,35 @@ const createFilmDetailsTemplate = (film) => {
           </div>
           <div class="film-details__info-wrap">
             <div class="film-details__poster">
-              <img class="film-details__poster-img" src="./${poster}" alt="">
+              <img class="film-details__poster-img" src="./${filmInfo['poster']}" alt="">
 
-              <p class="film-details__age">${ageRating}+</p>
+              <p class="film-details__age">${filmInfo['age_rating']}+</p>
             </div>
 
             <div class="film-details__info">
               <div class="film-details__info-head">
                 <div class="film-details__title-wrap">
-                  <h3 class="film-details__title">${title}</h3>
-                  <p class="film-details__title-original">${titleOriginal}</p>
+                  <h3 class="film-details__title">${filmInfo['title']}</h3>
+                  <p class="film-details__title-original">${filmInfo['alternative_title']}</p>
                 </div>
 
                 <div class="film-details__rating">
-                  <p class="film-details__total-rating">${rating}</p>
+                  <p class="film-details__total-rating">${filmInfo['total_rating']}</p>
                 </div>
               </div>
 
               <table class="film-details__table">
                 <tr class="film-details__row">
                   <td class="film-details__term">Director</td>
-                  <td class="film-details__cell">${director}</td>
+                  <td class="film-details__cell">${filmInfo['director']}</td>
                 </tr>
                 <tr class="film-details__row">
                   <td class="film-details__term">Writers</td>
-                  <td class="film-details__cell">${writers}</td>
+                  <td class="film-details__cell">${filmInfo['writers']}</td>
                 </tr>
                 <tr class="film-details__row">
                   <td class="film-details__term">Actors</td>
-                  <td class="film-details__cell">${actors}</td>
+                  <td class="film-details__cell">${filmInfo['actors']}</td>
                 </tr>
                 <tr class="film-details__row">
                   <td class="film-details__term">Release Date</td>
@@ -128,7 +119,7 @@ const createFilmDetailsTemplate = (film) => {
                 </tr>
                 <tr class="film-details__row">
                   <td class="film-details__term">Country</td>
-                  <td class="film-details__cell">${releaseCountry}</td>
+                  <td class="film-details__cell">${filmInfo['release']['release_country']}</td>
                 </tr>
                 <tr class="film-details__row">
                   ${genresTemplate}
@@ -136,7 +127,7 @@ const createFilmDetailsTemplate = (film) => {
               </table>
 
               <p class="film-details__film-description">
-                ${description}
+                ${filmInfo['description']}
               </p>
             </div>
           </div>

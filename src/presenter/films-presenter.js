@@ -24,30 +24,15 @@ export default class FilmsPresenter {
   #listFilms = [];
   #renderedFilmCount = FILM_COUNT_PER_STEP;
 
-  init = (filmsContainer, filmsModel) => {
+  constructor(filmsContainer, filmsModel) {
     this.#filmsContainer = filmsContainer;
     this.#filmsModel = filmsModel;
+  }
+
+  init = () => {
     this.#listFilms = [...this.#filmsModel.films];
 
-    render(this.#filmsComponent, this.#filmsContainer);
-
-    if (this.#listFilms.every((film) => film.isArchive)) {
-      render(new FilmsEmptyView(), this.#filmsComponent.element);
-    } else {
-      render(new SortView(), this.#filmsListComponent.element);
-      render(this.#filmsListComponent, this.#filmsComponent.element);
-      render(this.#filmsСontainerComponent, this.#filmsListComponent.element);
-
-      for (let i = 0; i < Math.min(this.#listFilms.length, FILM_COUNT_PER_STEP); i++) {
-        this.#renderFilm(this.#listFilms[i]);
-      }
-
-      if (this.#listFilms.length > FILM_COUNT_PER_STEP) {
-        render(this.#showMoreButtonComponent, this.#filmsListComponent.element);
-
-        this.#showMoreButtonComponent.element.addEventListener('click', this.#handleShowMoreButtonClick);
-      }
-    }
+    this.#renderFilmsComponent();
   };
 
   #handleShowMoreButtonClick = (evt) => {
@@ -108,5 +93,27 @@ export default class FilmsPresenter {
     });
 
     render(filmComponent, this.#filmsСontainerComponent.element);
+  };
+
+  #renderFilmsComponent = () => {
+    render(this.#filmsComponent, this.#filmsContainer);
+
+    if (this.#listFilms.every((film) => film.isArchive)) {
+      render(new FilmsEmptyView(), this.#filmsComponent.element);
+    } else {
+      render(new SortView(), this.#filmsListComponent.element);
+      render(this.#filmsListComponent, this.#filmsComponent.element);
+      render(this.#filmsСontainerComponent, this.#filmsListComponent.element);
+
+      for (let i = 0; i < Math.min(this.#listFilms.length, FILM_COUNT_PER_STEP); i++) {
+        this.#renderFilm(this.#listFilms[i]);
+      }
+
+      if (this.#listFilms.length > FILM_COUNT_PER_STEP) {
+        render(this.#showMoreButtonComponent, this.#filmsListComponent.element);
+
+        this.#showMoreButtonComponent.element.addEventListener('click', this.#handleShowMoreButtonClick);
+      }
+    }
   };
 }
