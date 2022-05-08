@@ -171,23 +171,30 @@ const createFilmDetailsTemplate = (film) => {
 };
 
 export default class FilmDetailsView {
+  #element = null;
+  #film = null;
+
   constructor(film) {
-    this.film = film;
+    this.#film = film;
   }
 
-  getTemplate() {
-    return createFilmDetailsTemplate(this.film);
+  get template() {
+    return createFilmDetailsTemplate(this.#film);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
 
-    return this.element;
+    return this.#element;
+  }
+
+  get closeButton() {
+    return this.element.querySelector('.film-details__close-btn');
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }

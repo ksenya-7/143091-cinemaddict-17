@@ -3,20 +3,21 @@ import {createElement} from '../render.js';
 const createStatisticsTemplate = () => '<p>130 291 movies inside</p>';
 
 export default class StatisticsView {
+  #element = null;
 
-  getTemplate() {
+  get template() {
     return createStatisticsTemplate();
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
 
-    return this.element;
+    return this.#element;
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }
