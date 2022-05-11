@@ -6,7 +6,7 @@ import ShowMoreButtonView from '../view/show-more-button-view.js';
 import FilmDetailsView from '../view/film-details-view.js';
 import FilmsEmptyView from '../view/films-empty-view.js';
 import SortView from '../view/sort-view.js';
-import {render} from '../render.js';
+import {render, remove} from '../framework/render.js';
 
 const FILM_COUNT_PER_STEP = 5;
 const body = document.querySelector('body');
@@ -35,8 +35,7 @@ export default class FilmsPresenter {
     this.#renderFilmsComponent();
   };
 
-  #handleShowMoreButtonClick = (evt) => {
-    evt.preventDefault();
+  #handleShowMoreButtonClick = () => {
     this.#listFilms
       .slice(this.#renderedFilmCount, this.#renderedFilmCount + FILM_COUNT_PER_STEP)
       .forEach((film) => this.#renderFilm(film));
@@ -44,14 +43,13 @@ export default class FilmsPresenter {
     this.#renderedFilmCount += FILM_COUNT_PER_STEP;
 
     if (this.#renderedFilmCount >= this.#listFilms.length) {
-      this.#showMoreButtonComponent.element.remove();
-      this.#showMoreButtonComponent.removeElement();
+      remove(this.#showMoreButtonComponent);
     }
   };
 
   #openFilmDetail = (film) => {
     this.#filmDetailComponent = new FilmDetailsView(film);
-    this.#filmDetailComponent.closeButton.addEventListener('click', this.#closeFilmDetail);
+    this.#filmDetailComponent.setCloseClickHandler(this.#closeFilmDetail);
     document.addEventListener('keydown', this.#handleKeyDown);
     document.addEventListener('click', this.#handleClickOutside);
     render(this.#filmDetailComponent, body);
@@ -59,9 +57,8 @@ export default class FilmsPresenter {
   };
 
   #closeFilmDetail = () => {
-    this.#filmDetailComponent.element.remove();
-    this.#filmDetailComponent.removeElement();
-    this.#filmDetailComponent.closeButton.removeEventListener('click', this.#closeFilmDetail);
+    remove(this.#filmDetailComponent);
+    this.#filmDetailComponent.removeCloseClickHandler(this.#closeFilmDetail);
     document.removeEventListener('keydown', this.#handleKeyDown);
     document.removeEventListener('click', this.#handleClickOutside);
     body.classList.remove('hide-overflow');
@@ -83,8 +80,7 @@ export default class FilmsPresenter {
   #renderFilm = (film) => {
     const filmComponent = new FilmCardView(film);
 
-    filmComponent.element.addEventListener('click', (evt) => {
-      evt.stopPropagation();
+    filmComponent.setOpenClickHandler(() => {
       if (this.#filmDetailComponent) {
         this.#closeFilmDetail();
       } else {
@@ -112,7 +108,7 @@ export default class FilmsPresenter {
       if (this.#listFilms.length > FILM_COUNT_PER_STEP) {
         render(this.#showMoreButtonComponent, this.#filmsListComponent.element);
 
-        this.#showMoreButtonComponent.element.addEventListener('click', this.#handleShowMoreButtonClick);
+        this.#showMoreButtonComponent.setClickHandler(this.#handleShowMoreButtonClick);
       }
     }
   };

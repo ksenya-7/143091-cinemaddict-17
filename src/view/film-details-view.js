@@ -1,5 +1,6 @@
-import {createElement} from '../render.js';
-import {humanizeFilmReleaseDate, getTimeFromMins} from '../utils.js';
+import AbstractView from '../framework/view/abstract-view.js';
+import {humanizeFilmReleaseDate} from '../utils/film.js';
+import {getTimeFromMins} from '../utils/common.js';
 import {generateComment} from '../mock/comments.js';
 import {EMOTIONS} from '../const.js';
 
@@ -161,11 +162,11 @@ const createFilmDetailsTemplate = (film) => {
   );
 };
 
-export default class FilmDetailsView {
-  #element = null;
+export default class FilmDetailsView extends AbstractView {
   #film = null;
 
   constructor(film) {
+    super();
     this.#film = film;
   }
 
@@ -173,19 +174,21 @@ export default class FilmDetailsView {
     return createFilmDetailsTemplate(this.#film);
   }
 
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
-  }
-
   get closeButton() {
     return this.element.querySelector('.film-details__close-btn');
   }
 
-  removeElement() {
-    this.#element = null;
-  }
+  setCloseClickHandler = (callback) => {
+    this._callback.closeClick = callback;
+    this.closeButton.addEventListener('click', this.#closeClickHandler);
+  };
+
+  removeCloseClickHandler = (callback) => {
+    this._callback.closeClick = callback;
+    this.closeButton.removeEventListener('click', this.#closeClickHandler);
+  };
+
+  #closeClickHandler = () => {
+    this._callback.closeClick();
+  };
 }

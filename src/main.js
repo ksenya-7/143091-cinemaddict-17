@@ -2,7 +2,7 @@ import ProfileButtonView from './view/profile-button-view.js';
 import MainNavigationView from './view/main-navigation-view.js';
 import StatisticsView from './view/statistics-view.js';
 import FilmsPresenter from './presenter/films-presenter.js';
-import {render} from './render.js';
+import {render} from './framework/render.js';
 import FilmsModel from './model/films-model.js';
 
 const siteBodyElement = document.querySelector('body');
