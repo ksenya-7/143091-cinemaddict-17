@@ -1,9 +1,9 @@
 const EMOTIONS = ['smile', 'sleeping', 'puke', 'angry'];
 
 const FilterType = {
-  WATCHLIST: 'watchlist',
-  HISTORY: 'history',
-  FAVORITES: 'favorites',
+  WATCHLIST: 'Watchlist',
+  HISTORY: 'History',
+  FAVORITES: 'Favorites',
 };
 
 export {EMOTIONS, FilterType};

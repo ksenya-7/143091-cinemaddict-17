@@ -16,7 +16,7 @@ const filters = generateFilter(filmsModel.films);
 const filmsPresenter = new FilmsPresenter(siteMainElement, filmsModel);
 
 render(new ProfileButtonView(), siteHeaderElement);
-render(new MainNavigationView((filters)), siteMainElement);
+render(new MainNavigationView(filters), siteMainElement);
 render(new StatisticsView(), siteFooterElement);
 
 filmsPresenter.init();
