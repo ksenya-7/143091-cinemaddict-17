@@ -49,7 +49,7 @@ const createEmotionsTemplate = () => EMOTIONS.map((el) => (
     </label>`)).join('');
 
 
-const createFilmDetailsTemplate = (film) => {
+const createFilmPopupTemplate = (film) => {
   const filmInfo = film['film_info'];
 
   const releaseDate = filmInfo['release']['date'];
@@ -162,7 +162,7 @@ const createFilmDetailsTemplate = (film) => {
   );
 };
 
-export default class FilmDetailsView extends AbstractView {
+export default class FilmPopupView extends AbstractView {
   #film = null;
 
   constructor(film) {
@@ -171,7 +171,7 @@ export default class FilmDetailsView extends AbstractView {
   }
 
   get template() {
-    return createFilmDetailsTemplate(this.#film);
+    return createFilmPopupTemplate(this.#film);
   }
 
   get closeButton() {
