@@ -4,11 +4,13 @@ import FilmsListView from '../view/films-list-view.js';
 import FilmsСontainerView from '../view/films-container-view.js';
 import ShowMoreButtonView from '../view/show-more-button-view.js';
 import FilmsEmptyView from '../view/films-empty-view.js';
+import FilmDetailsView from '../view/film-details-view.js';
 import SortView from '../view/sort-view.js';
 import FilmPresenter from './film-presenter.js';
 
 const FILM_COUNT_PER_STEP = 5;
 
+const body = document.querySelector('body');
 export default class FilmsPresenter {
   #filmsContainer = null;
   #filmsModel = null;
@@ -16,7 +18,7 @@ export default class FilmsPresenter {
 
   #filmsComponent = new FilmsView();
   #filmsListComponent = new FilmsListView();
-  #filmsСontainerComponent = new FilmsСontainerView();
+  #filmsContainerComponent = new FilmsСontainerView();
   #sortComponent = new SortView();
   #noFilmComponent = new FilmsEmptyView();
   #showMoreButtonComponent = new ShowMoreButtonView();
@@ -65,14 +67,48 @@ export default class FilmsPresenter {
     this.#showMoreButtonComponent.setClickHandler(this.#handleShowMoreButtonClick);
   };
 
+  #openFilmDetail = (film) => {
+    if (this.#filmDetailComponent) {
+      this.#closeFilmDetail();
+      return;
+    }
+    this.#filmDetailComponent = new FilmDetailsView(film);
+    this.#filmDetailComponent.setCloseClickHandler(this.#closeFilmDetail);
+    document.addEventListener('keydown', this.#handleKeyDown);
+    document.addEventListener('click', this.#handleClickOutside);
+    render(this.#filmDetailComponent, body);
+    body.classList.add('hide-overflow');
+  };
+
+  #closeFilmDetail = () => {
+    remove(this.#filmDetailComponent);
+    this.#filmDetailComponent.removeCloseClickHandler(this.#closeFilmDetail);
+    document.removeEventListener('keydown', this.#handleKeyDown);
+    document.removeEventListener('click', this.#handleClickOutside);
+    body.classList.remove('hide-overflow');
+    this.#filmDetailComponent = null;
+  };
+
+  #handleKeyDown = (evt) => {
+    if (evt.key === 'Escape' || evt.key === 'Esc') {
+      this.#closeFilmDetail();
+    }
+  };
+
+  #handleClickOutside = (evt) => {
+    if (!this.#filmDetailComponent.element.contains(evt.target)) {
+      this.#closeFilmDetail();
+    }
+  };
+
   #renderFilm = (film) => {
-    const filmPresenter = new FilmPresenter(this.#filmsСontainerComponent.element);
+    const filmPresenter = new FilmPresenter(this.#filmsContainerComponent.element, this.#openFilmDetail);
     filmPresenter.init(film);
   };
 
   #renderFilmsList = () => {
     render(this.#filmsListComponent, this.#filmsComponent.element);
-    render(this.#filmsСontainerComponent, this.#filmsListComponent.element);
+    render(this.#filmsContainerComponent, this.#filmsListComponent.element);
 
     this.#renderFilms(0, Math.min(this.#listFilms.length, FILM_COUNT_PER_STEP));
 
