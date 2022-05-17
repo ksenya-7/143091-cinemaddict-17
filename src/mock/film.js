@@ -1,4 +1,5 @@
 import {getRandomInteger} from '../utils/common.js';
+import {nanoid} from 'nanoid';
 
 const generateDate = () => {
   const dates = [
@@ -174,15 +175,18 @@ const generateGenre = () => {
 export const generateFilm = () => ({
   amountComments: generateAmountComments(),
   genre: generateGenre(),
-  'id': '0',
+  'id': nanoid(),
   'comments': [
     1, 2, 3, 4
   ],
   'film_info': generateFilmInfo(),
   'user_details': {
-    'watchlist': Boolean(getRandomInteger(0, 1)),
-    'already_watched': Boolean(getRandomInteger(0, 1)),
+    // 'watchlist': Boolean(getRandomInteger(0, 1)),
+    // 'already_watched': Boolean(getRandomInteger(0, 1)),
     'watching_date': generateDate(),
-    'favorite': Boolean(getRandomInteger(0, 1)),
-  }
+    // 'favorite': Boolean(getRandomInteger(0, 1)),
+  },
+  watchlist: Boolean(getRandomInteger(0, 1)),
+  watched: Boolean(getRandomInteger(0, 1)),
+  favorite: Boolean(getRandomInteger(0, 1)),
 });
