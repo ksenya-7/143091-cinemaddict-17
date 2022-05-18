@@ -6,4 +6,10 @@ const FilterType = {
   FAVORITES: 'Favorites',
 };
 
-export {EMOTIONS, FilterType};
+const SortType = {
+  DEFAULT: 'default',
+  DATE: 'date',
+  RATING: 'rating',
+};
+
+export {EMOTIONS, FilterType, SortType};

@@ -181,10 +181,7 @@ export const generateFilm = () => ({
   ],
   'film_info': generateFilmInfo(),
   'user_details': {
-    // 'watchlist': Boolean(getRandomInteger(0, 1)),
-    // 'already_watched': Boolean(getRandomInteger(0, 1)),
     'watching_date': generateDate(),
-    // 'favorite': Boolean(getRandomInteger(0, 1)),
   },
   watchlist: Boolean(getRandomInteger(0, 1)),
   watched: Boolean(getRandomInteger(0, 1)),
