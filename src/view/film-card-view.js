@@ -11,20 +11,9 @@ const createFilmCardTemplate = (film) => {
   const year = humanizeFilmReleaseYear(releaseDate);
   const runtime = getTimeFromMins(filmInfo['runtime']);
 
-  const isWatchlist = film.watchlist;
-  const watchlistClassName = isWatchlist
-    ? 'film-card__controls-item--active'
-    : '';
-
-  const isWatched = film.watched;
-  const watchedClassName = isWatched
-    ? 'film-card__controls-item--active'
-    : '';
-
-  const isFavorite = film.favorite;
-  const favoriteClassName = isFavorite
-    ? 'film-card__controls-item--active'
-    : '';
+  const watchlistClassName = film.watchlist ? 'film-card__controls-item--active' : '';
+  const watchedClassName = film.watched ? 'film-card__controls-item--active' : '';
+  const favoriteClassName = film.favorite ? 'film-card__controls-item--active' : '';
 
   return (
     `<article class="film-card">
