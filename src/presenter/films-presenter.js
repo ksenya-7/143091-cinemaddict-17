@@ -27,9 +27,6 @@ export default class FilmsPresenter {
   #listFilms = [];
   #renderedFilmCount = FILM_COUNT_PER_STEP;
   #filmPresenter = new Map();
-  #popupFilm = new Map();
-  #changeData = null;
-  #changePopupData = null;
   #film = null;
 
   constructor(filmsContainer, filmsModel) {
@@ -58,12 +55,6 @@ export default class FilmsPresenter {
     this.#filmPresenter.get(updatedFilm.id).init(updatedFilm);
   };
 
-  #handleFilmPopupChange = (updatedFilmPopup) => {
-    this.#listFilms = updateItem(this.#listFilms, updatedFilmPopup);
-    this.#filmPresenter.get(updatedFilmPopup.id).init(updatedFilmPopup);
-    this.#openFilmPopup(updatedFilmPopup);
-  };
-
   #renderSort = () => {
     render(this.#sortComponent, this.#filmsListComponent.element, RenderPosition.AFTERBEGIN);
   };
@@ -90,49 +81,34 @@ export default class FilmsPresenter {
     this.#showMoreButtonComponent.setClickHandler(this.#handleShowMoreButtonClick);
   };
 
-  #setClickHandlers = (popup) => {
-    popup.setCloseClickHandler(this.#closeFilmPopup);
-    popup.setWatchlistPopupClickHandler(this.#watchlistPopupClickHandler);
-    popup.setWatchedPopupClickHandler(this.#watchedPopupClickHandler);
-    popup.setFavoritePopupClickHandler(this.#favoritePopupClickHandler);
-
-    render(popup, body);
-  };
-
   #openFilmPopup = (film) => {
     this.#film = film;
 
     if (this.#filmPopupComponent) {
       this.#closeFilmPopup();
-      return;
     }
+
     this.#filmPopupComponent = new FilmPopupView(film);
-    this.#popupFilm.set(film.id, this.#filmPopupComponent);
+    this.#filmPopupComponent.setCloseClickHandler(this.#closeFilmPopup);
+    this.#filmPopupComponent.setWatchlistPopupClickHandler(this.#watchlistPopupClickHandler);
+    this.#filmPopupComponent.setWatchedPopupClickHandler(this.#watchedPopupClickHandler);
+    this.#filmPopupComponent.setFavoritePopupClickHandler(this.#favoritePopupClickHandler);
+    render(this.#filmPopupComponent, body);
 
-    this.#setClickHandlers(this.#filmPopupComponent);
     document.addEventListener('keydown', this.#handleKeyDown);
-    document.addEventListener('click', this.#handleClickOutside);
-
     body.classList.add('hide-overflow');
   };
 
   #closeFilmPopup = () => {
     remove(this.#filmPopupComponent);
-    this.#filmPopupComponent.removeCloseClickHandler(this.#closeFilmPopup);
+
     document.removeEventListener('keydown', this.#handleKeyDown);
-    document.removeEventListener('click', this.#handleClickOutside);
     body.classList.remove('hide-overflow');
     this.#filmPopupComponent = null;
   };
 
   #handleKeyDown = (evt) => {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
-      this.#closeFilmPopup();
-    }
-  };
-
-  #handleClickOutside = (evt) => {
-    if (!this.#filmPopupComponent.element.contains(evt.target)) {
       this.#closeFilmPopup();
     }
   };
@@ -168,29 +144,26 @@ export default class FilmsPresenter {
   };
 
   #watchlistPopupClickHandler = () => {
-    const updatedFilmPopup = {...this.#film, watchlist: !this.#film.watchlist};
+    const film = {...this.#film, watchlist: !this.#film.watchlist};
 
-    console.log({...this.#film});
-    console.log(updatedFilmPopup);
-
-    this.#listFilms = updateItem(this.#listFilms, updatedFilmPopup);
-    this.#filmPresenter.get(updatedFilmPopup.id).init(updatedFilmPopup);
-    // this.#openFilmPopup(updatedFilmPopup);
-
-    this.#closeFilmPopup();
-    this.#filmPopupComponent = new FilmPopupView(updatedFilmPopup);
-    this.#setClickHandlers(this.#filmPopupComponent);
-    document.addEventListener('keydown', this.#handleKeyDown);
-    body.classList.add('hide-overflow');
-
-    // this.#filmPopupComponent = newfilmPopupComponent;
+    this.#listFilms = updateItem(this.#listFilms, film);
+    this.#filmPresenter.get(film.id).init(film);
+    this.#openFilmPopup(film);
   };
 
   #watchedPopupClickHandler = () => {
-    this.#changePopupData({...this.#film, watched: !this.#film.watched});
+    const film = {...this.#film, watched: !this.#film.watched};
+
+    this.#listFilms = updateItem(this.#listFilms, film);
+    this.#filmPresenter.get(film.id).init(film);
+    this.#openFilmPopup(film);
   };
 
   #favoritePopupClickHandler = () => {
-    this.#changePopupData({...this.#film, favorite: !this.#film.favorite});
+    const film = {...this.#film, favorite: !this.#film.favorite};
+
+    this.#listFilms = updateItem(this.#listFilms, film);
+    this.#filmPresenter.get(film.id).init(film);
+    this.#openFilmPopup(film);
   };
 }
