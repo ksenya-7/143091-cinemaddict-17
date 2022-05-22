@@ -1,35 +1,26 @@
-import {getRandomInteger} from '../utils/common.js';
-
-const generateDate = () => {
+const date = (index) => {
   const dates = [
-    '1933-05-10T16:12:12.554Z',
-    '1935-04-11T16:13:22.554Z',
-    '1937-06-12T16:14:32.554Z',
-    '2019-07-13T16:12:42.554Z',
-    '1960-08-14T16:15:52.554Z',
-    '2020-09-15T16:16:35.554Z',
-    '2015-10-16T16:17:36.554Z',
-    '1955-12-17T16:18:37.554Z',
+    '2019/12/31 23:59',
+    '2 days ago',
+    '2 days ago',
+    'Today',
   ];
 
-  const randomIndex = getRandomInteger(0, dates.length - 1);
-
-  return dates[randomIndex];
+  return dates[index - 1];
 };
 
-const generateAuthor = () => {
+const author = (index) => {
   const authors = [
-    'Ilya O\u0027Reilly',
     'Tim Macoveev',
+    'John Doe',
+    'John Doe',
     'John Doe',
   ];
 
-  const randomIndex = getRandomInteger(0, authors.length - 1);
-
-  return authors[randomIndex];
+  return authors[index - 1];
 };
 
-const generateEmotion = () => {
+const emotion = (index) => {
   const emotions = [
     'smile',
     'sleeping',
@@ -37,29 +28,24 @@ const generateEmotion = () => {
     'angry',
   ];
 
-  const randomIndex = getRandomInteger(0, emotions.length - 1);
-
-  return emotions[randomIndex];
+  return emotions[index - 1];
 };
 
-const generateTextComment = () => {
+const textComment = (index) => {
   const textComments = [
-    'a film that changed my life, a true masterpiece, post-credit scene was just amazing omg.',
     'Interesting setting and a good cast',
     'Booooooooooring',
     'Very very old. Meh',
     'Almost two hours? Seriously?',
   ];
 
-  const randomIndex = getRandomInteger(0, textComments.length - 1);
-
-  return textComments[randomIndex];
+  return textComments[index - 1];
 };
 
 export const generateComment = (index) => ({
   'id': index,
-  'author': generateAuthor(),
-  'comment': generateTextComment(),
-  'date': generateDate(),
-  'emotion': generateEmotion(),
+  'author': author(index),
+  'comment': textComment(index),
+  'date': date(index),
+  'emotion': emotion(index),
 });

@@ -1,7 +1,16 @@
-import AbstractView from '../framework/view/abstract-view.js';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import {humanizeFilmReleaseDate} from '../utils/film.js';
 import {getTimeFromMins} from '../utils/common.js';
 import {EMOTIONS} from '../const.js';
+import {generateComment} from '../mock/comments.js';
+import dayjs from 'dayjs';
+
+const BLANK_COMMENT = {
+  comment: '',
+  date: dayjs().format('YYYY/MM/DD HH:MM'),
+  emotion: '',
+  isEmotion: false,
+};
 
 const createGenresTemplate = (genres) => {
   const createSpansTemplate = () => genres.map((element) => (`<span class="film-details__genre">${element}</span>`)).join('');
@@ -12,6 +21,26 @@ const createGenresTemplate = (genres) => {
     `
   );
 };
+
+const createCommentsTemplate = (comments) => comments.map((comment) => {
+  const commentById = generateComment(comment);
+
+  return (
+    `<li class="film-details__comment">
+      <span class="film-details__comment-emoji">
+        <img src="./images/emoji/${commentById['emotion']}.png" width="55" height="55" alt="emoji-smile">
+      </span>
+      <div>
+        <p class="film-details__comment-text">${commentById['comment']}</p>
+        <p class="film-details__comment-info">
+          <span class="film-details__comment-author">${commentById['author']}</span>
+          <span class="film-details__comment-day">${commentById['date']}</span>
+          <button class="film-details__comment-delete">Delete</button>
+        </p>
+      </div>
+    </li>`);
+}).join('');
+
 
 const createEmotionsTemplate = () => EMOTIONS.map((el) => (
   `<input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-smile" value="smile">
@@ -32,6 +61,7 @@ const createFilmPopupTemplate = (film) => {
   const genresTemplate = createGenresTemplate(genre);
 
   const comments = film['comments'];
+  const commentsTemplate = createCommentsTemplate(comments);
 
   const watchlistClassName = film.watchlist ? 'film-details__control-button--active' : '';
   const watchedClassName = film.watched ? 'film-details__control-button--active' : '';
@@ -112,58 +142,7 @@ const createFilmPopupTemplate = (film) => {
           <section class="film-details__comments-wrap">
             <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
             <ul class="film-details__comments-list">
-              <li class="film-details__comment">
-                <span class="film-details__comment-emoji">
-                  <img src="./images/emoji/smile.png" width="55" height="55" alt="emoji-smile">
-                </span>
-                <div>
-                  <p class="film-details__comment-text">Interesting setting and a good cast</p>
-                  <p class="film-details__comment-info">
-                    <span class="film-details__comment-author">Tim Macoveev</span>
-                    <span class="film-details__comment-day">2019/12/31 23:59</span>
-                    <button class="film-details__comment-delete">Delete</button>
-                  </p>
-                </div>
-              </li>
-              <li class="film-details__comment">
-                <span class="film-details__comment-emoji">
-                  <img src="./images/emoji/sleeping.png" width="55" height="55" alt="emoji-sleeping">
-                </span>
-                <div>
-                  <p class="film-details__comment-text">Booooooooooring</p>
-                  <p class="film-details__comment-info">
-                    <span class="film-details__comment-author">John Doe</span>
-                    <span class="film-details__comment-day">2 days ago</span>
-                    <button class="film-details__comment-delete">Delete</button>
-                  </p>
-                </div>
-              </li>
-              <li class="film-details__comment">
-                <span class="film-details__comment-emoji">
-                  <img src="./images/emoji/puke.png" width="55" height="55" alt="emoji-puke">
-                </span>
-                <div>
-                  <p class="film-details__comment-text">Very very old. Meh</p>
-                  <p class="film-details__comment-info">
-                    <span class="film-details__comment-author">John Doe</span>
-                    <span class="film-details__comment-day">2 days ago</span>
-                    <button class="film-details__comment-delete">Delete</button>
-                  </p>
-                </div>
-              </li>
-              <li class="film-details__comment">
-                <span class="film-details__comment-emoji">
-                  <img src="./images/emoji/angry.png" width="55" height="55" alt="emoji-angry">
-                </span>
-                <div>
-                  <p class="film-details__comment-text">Almost two hours? Seriously?</p>
-                  <p class="film-details__comment-info">
-                    <span class="film-details__comment-author">John Doe</span>
-                    <span class="film-details__comment-day">Today</span>
-                    <button class="film-details__comment-delete">Delete</button>
-                  </p>
-                </div>
-              </li>
+              ${commentsTemplate}
             </ul>
             <div class="film-details__new-comment">
               <div class="film-details__add-emoji-label"></div>
@@ -183,16 +162,18 @@ const createFilmPopupTemplate = (film) => {
   );
 };
 
-export default class FilmPopupView extends AbstractView {
+export default class FilmPopupView extends AbstractStatefulView {
   #film = null;
 
   constructor(film) {
     super();
     this.#film = film;
+    // this._state = FilmPopupView.parseFilmToState(film);
   }
 
   get template() {
     return createFilmPopupTemplate(this.#film);
+    // return createFilmPopupTemplate(this._state);
   }
 
   setCloseClickHandler = (callback) => {
@@ -230,4 +211,8 @@ export default class FilmPopupView extends AbstractView {
   #favoritePopupClickHandler = () => {
     this._callback.favoritePopupClick();
   };
+
+  // static parseFilmToState = (film) => ({...film,
+  //   isEmotion: comment['emotion'] !== null,
+  // });
 }
