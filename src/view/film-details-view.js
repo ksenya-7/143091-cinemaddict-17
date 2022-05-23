@@ -3,14 +3,8 @@ import {humanizeFilmReleaseDate} from '../utils/film.js';
 import {getTimeFromMins} from '../utils/common.js';
 import {EMOTIONS} from '../const.js';
 import {generateComment} from '../mock/comments.js';
-import dayjs from 'dayjs';
+// import dayjs from 'dayjs';
 
-const BLANK_COMMENT = {
-  comment: '',
-  date: dayjs().format('YYYY/MM/DD HH:MM'),
-  emotion: '',
-  isEmotion: null,
-};
 
 const createGenresTemplate = (genres) => {
   const createSpansTemplate = () => genres.map((element) => (`<span class="film-details__genre">${element}</span>`)).join('');
@@ -48,7 +42,7 @@ const createEmotionsTemplate = () => EMOTIONS.map((el) => (
       <img src="./images/emoji/${el}.png" width="30" height="30" alt="emoji-${el}">
     </label>`)).join('');
 
-const createFilmPopupTemplate = (film, isEmotion, isNewComment) => {
+const createFilmPopupTemplate = (film) => {
   const filmInfo = film['film_info'];
 
   const releaseDate = filmInfo['release']['date'];
