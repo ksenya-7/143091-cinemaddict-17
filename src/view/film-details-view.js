@@ -9,7 +9,7 @@ const BLANK_COMMENT = {
   comment: '',
   date: dayjs().format('YYYY/MM/DD HH:MM'),
   emotion: '',
-  isEmotion: false,
+  isEmotion: null,
 };
 
 const createGenresTemplate = (genres) => {
@@ -28,13 +28,13 @@ const createCommentsTemplate = (comments) => comments.map((comment) => {
   return (
     `<li class="film-details__comment">
       <span class="film-details__comment-emoji">
-        <img src="./images/emoji/${commentById['emotion']}.png" width="55" height="55" alt="emoji-smile">
+        <img src="./images/emoji/${commentById.emotion}.png" width="55" height="55" alt="emoji-${commentById.emotion}">
       </span>
       <div>
-        <p class="film-details__comment-text">${commentById['comment']}</p>
+        <p class="film-details__comment-text">${commentById.comment}</p>
         <p class="film-details__comment-info">
-          <span class="film-details__comment-author">${commentById['author']}</span>
-          <span class="film-details__comment-day">${commentById['date']}</span>
+          <span class="film-details__comment-author">${commentById.author}</span>
+          <span class="film-details__comment-day">${commentById.date}</span>
           <button class="film-details__comment-delete">Delete</button>
         </p>
       </div>
@@ -43,13 +43,12 @@ const createCommentsTemplate = (comments) => comments.map((comment) => {
 
 
 const createEmotionsTemplate = () => EMOTIONS.map((el) => (
-  `<input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-smile" value="smile">
-    <label class="film-details__emoji-label" for="emoji-smile">
-      <img src="./images/emoji/${el}.png" width="30" height="30" alt="emoji">
+  `<input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${el}" value="${el}">
+    <label class="film-details__emoji-label" for="emoji-${el}">
+      <img src="./images/emoji/${el}.png" width="30" height="30" alt="emoji-${el}">
     </label>`)).join('');
 
-
-const createFilmPopupTemplate = (film) => {
+const createFilmPopupTemplate = (film, isEmotion, isNewComment) => {
   const filmInfo = film['film_info'];
 
   const releaseDate = filmInfo['release']['date'];
@@ -60,7 +59,7 @@ const createFilmPopupTemplate = (film) => {
   const genre = filmInfo['genre'];
   const genresTemplate = createGenresTemplate(genre);
 
-  const comments = film['comments'];
+  const comments = film.comments;
   const commentsTemplate = createCommentsTemplate(comments);
 
   const watchlistClassName = film.watchlist ? 'film-details__control-button--active' : '';
@@ -145,10 +144,10 @@ const createFilmPopupTemplate = (film) => {
               ${commentsTemplate}
             </ul>
             <div class="film-details__new-comment">
-              <div class="film-details__add-emoji-label"></div>
+              <div class="film-details__add-emoji-label">${isNewComment ? `<img src="./images/emoji/${BLANK_COMMENT.emotion}.png" width="55" height="55" alt="emoji-${BLANK_COMMENT.emotion}"` : ''}</div>
 
               <label class="film-details__comment-label">
-                <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
+                <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${isNewComment ? `${BLANK_COMMENT.comment}` : ''}</textarea>
               </label>
 
               <div class="film-details__emoji-list">
@@ -168,6 +167,7 @@ export default class FilmPopupView extends AbstractStatefulView {
   constructor(film) {
     super();
     this.#film = film;
+    console.log(FilmPopupView.parseFilmToState(film));
     // this._state = FilmPopupView.parseFilmToState(film);
   }
 
@@ -212,7 +212,30 @@ export default class FilmPopupView extends AbstractStatefulView {
     this._callback.favoritePopupClick();
   };
 
-  // static parseFilmToState = (film) => ({...film,
-  //   isEmotion: comment['emotion'] !== null,
-  // });
+  static parseFilmToState = (film, comments) => (
+    {...film
+    },
+    {...comments,
+      id: film.comments.length + 1,
+      author: 'John Doe',
+      // comment: textComment(index),
+      date: dayjs().format('YYYY/MM/DD HH:MM'),
+      // emotion: emotion(index),
+      isEmotion: BLANK_COMMENT.emotion !== null,
+      isNewComment: BLANK_COMMENT.comment !== null,
+    }
+  );
+
+  static parseStateToFilm = (state) => {
+    const film = {...state};
+
+    return film;
+  };
 }
+
+// const BLANK_COMMENT = {
+//   comment: '',
+//   date: dayjs().format('YYYY/MM/DD HH:MM'),
+//   emotion: '',
+//   isEmotion: false,
+// };

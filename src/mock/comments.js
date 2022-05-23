@@ -43,9 +43,9 @@ const textComment = (index) => {
 };
 
 export const generateComment = (index) => ({
-  'id': index,
-  'author': author(index),
-  'comment': textComment(index),
-  'date': date(index),
-  'emotion': emotion(index),
+  id: index,
+  author: author(index),
+  comment: textComment(index),
+  date: date(index),
+  emotion: emotion(index),
 });
