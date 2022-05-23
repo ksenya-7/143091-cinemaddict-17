@@ -235,9 +235,8 @@ export default class FilmPopupView extends AbstractStatefulView {
 
   #formSubmitHandler = (evt) => {
     if (evt.ctrlKey && evt.key === 'Enter') {
-      // this._callback.formSubmit(FilmPopupView.parseStateToFilm(this._state));
+      this._callback.formSubmit(FilmPopupView.parseStateToFilm(this._state));
       // console.log(FilmPopupView.parseStateToFilm(this._state));
-      FilmPopupView.parseStateToFilm(this._state);
     }
   };
 
@@ -254,16 +253,18 @@ export default class FilmPopupView extends AbstractStatefulView {
   );
 
   static parseStateToFilm = (state) => {
-    const newComment = {
-      id: state.comments.length + 1,
-      comment: state.textComment,
-      emotion: state.emotionComment,
-      date: dayjs().format('YYYY/MM/DD HH:MM'),
-      author: 'John Doe',
-    };
+    // const newComment = {
+    //   id: state.comments.length + 1,
+    //   comment: state.textComment,
+    //   emotion: state.emotionComment,
+    //   date: dayjs().format('YYYY/MM/DD HH:MM'),
+    //   author: 'John Doe',
+    // };
+    state.comments.push(state.comments.length + 1);
+    console.log(state.comments);
 
     const film = {...state,
-      comments: state.comments.push(newComment),};
+      comments: state.comments};
 
     delete film.textComment;
     delete film.emotionComment;
