@@ -157,8 +157,6 @@ const createFilmPopupTemplate = (film) => {
 };
 
 export default class FilmPopupView extends AbstractStatefulView {
-  #film = null;
-
   constructor(film) {
     super();
 
@@ -209,6 +207,10 @@ export default class FilmPopupView extends AbstractStatefulView {
 
   _restoreHandlers = () => {
     this.#setInnerHandlers();
+    this.setCloseClickHandler(this._callback.closeClick);
+    this.setWatchlistPopupClickHandler(this._callback.watchlistPopupClick);
+    this.setWatchedPopupClickHandler(this._callback.watchedPopupClick);
+    this.setFavoritePopupClickHandler(this._callback.favoritePopupClick);
   };
 
   #emotionChangeHandler = (evt) => {
