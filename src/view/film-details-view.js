@@ -167,8 +167,10 @@ export default class FilmPopupView extends AbstractStatefulView {
   constructor(film) {
     super();
     this.#film = film;
-    console.log(FilmPopupView.parseFilmToState(film));
+
     // this._state = FilmPopupView.parseFilmToState(film);
+    this.#setInnerHandlers();
+    // console.log(FilmPopupView.parseFilmToState(film));
   }
 
   get template() {
@@ -212,15 +214,40 @@ export default class FilmPopupView extends AbstractStatefulView {
     this._callback.favoritePopupClick();
   };
 
+  _restoreHandlers = () => {
+    this.#setInnerHandlers();
+  };
+
+  #emotionChangeHandler = (evt) => {
+    evt.preventDefault();
+    // console.log(evt.target.value);
+    this.updateElement({
+      emotion: evt.target.value,
+    });
+  };
+
+  #commentInputHandler = (evt) => {
+    evt.preventDefault();
+    this._setState({
+      comment: evt.target.value,
+    });
+  };
+
+  #setInnerHandlers = () => {
+    this.element.querySelector('.film-details__emoji-list').addEventListener('change', this.#emotionChangeHandler);
+    this.element.querySelector('.film-details__comment-input').addEventListener('input', this.#commentInputHandler);
+  };
+
   static parseFilmToState = (film, comments) => (
-    {...film
+    {...film,
+      // comments: film.comments.push(film.comments.length + 1),
     },
     {...comments,
       id: film.comments.length + 1,
       author: 'John Doe',
-      // comment: textComment(index),
+      comment: '',
       date: dayjs().format('YYYY/MM/DD HH:MM'),
-      // emotion: emotion(index),
+      emotion: '',
       isEmotion: BLANK_COMMENT.emotion !== null,
       isNewComment: BLANK_COMMENT.comment !== null,
     }
@@ -232,10 +259,3 @@ export default class FilmPopupView extends AbstractStatefulView {
     return film;
   };
 }
-
-// const BLANK_COMMENT = {
-//   comment: '',
-//   date: dayjs().format('YYYY/MM/DD HH:MM'),
-//   emotion: '',
-//   isEmotion: false,
-// };
