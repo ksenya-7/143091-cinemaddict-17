@@ -127,6 +127,7 @@ export default class FilmsPresenter {
     this.#filmPopupComponent.setWatchlistPopupClickHandler(this.#watchlistPopupClickHandler);
     this.#filmPopupComponent.setWatchedPopupClickHandler(this.#watchedPopupClickHandler);
     this.#filmPopupComponent.setFavoritePopupClickHandler(this.#favoritePopupClickHandler);
+    this.#filmPopupComponent.setFormSubmitHandler(this.#handleFormSubmit);
     render(this.#filmPopupComponent, body);
 
     document.addEventListener('keydown', this.#handleKeyDown);
@@ -198,6 +199,10 @@ export default class FilmsPresenter {
 
     this.#listFilms = updateItem(this.#listFilms, film);
     this.#filmPresenter.get(film.id).init(film);
+    this.#openFilmPopup(film);
+  };
+
+  #handleFormSubmit = (film) => {
     this.#openFilmPopup(film);
   };
 }
