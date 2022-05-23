@@ -144,10 +144,11 @@ const createFilmPopupTemplate = (film, isEmotion, isNewComment) => {
               ${commentsTemplate}
             </ul>
             <div class="film-details__new-comment">
-              <div class="film-details__add-emoji-label">${isNewComment ? `<img src="./images/emoji/${BLANK_COMMENT.emotion}.png" width="55" height="55" alt="emoji-${BLANK_COMMENT.emotion}"` : ''}</div>
+              <div class="film-details__add-emoji-label">${film.emotionComment ? `<img src="./images/emoji/${film.emotionComment}.png" width="55" height="55" alt="emoji">` : ''}
+              </div>
 
               <label class="film-details__comment-label">
-                <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${isNewComment ? `${BLANK_COMMENT.comment}` : ''}</textarea>
+                <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${film.textComment ? `${film.textComment}` : ''}</textarea>
               </label>
 
               <div class="film-details__emoji-list">
@@ -166,16 +167,14 @@ export default class FilmPopupView extends AbstractStatefulView {
 
   constructor(film) {
     super();
-    this.#film = film;
 
-    // this._state = FilmPopupView.parseFilmToState(film);
+    this._state = FilmPopupView.parseFilmToState(film);
     this.#setInnerHandlers();
     // console.log(FilmPopupView.parseFilmToState(film));
   }
 
   get template() {
-    return createFilmPopupTemplate(this.#film);
-    // return createFilmPopupTemplate(this._state);
+    return createFilmPopupTemplate(this._state);
   }
 
   setCloseClickHandler = (callback) => {
@@ -222,14 +221,14 @@ export default class FilmPopupView extends AbstractStatefulView {
     evt.preventDefault();
     // console.log(evt.target.value);
     this.updateElement({
-      emotion: evt.target.value,
+      emotionComment: evt.target.value,
     });
   };
 
   #commentInputHandler = (evt) => {
     evt.preventDefault();
     this._setState({
-      comment: evt.target.value,
+      textComment: evt.target.value,
     });
   };
 
@@ -238,23 +237,19 @@ export default class FilmPopupView extends AbstractStatefulView {
     this.element.querySelector('.film-details__comment-input').addEventListener('input', this.#commentInputHandler);
   };
 
-  static parseFilmToState = (film, comments) => (
+  static parseFilmToState = (film) => (
     {...film,
       // comments: film.comments.push(film.comments.length + 1),
-    },
-    {...comments,
-      id: film.comments.length + 1,
-      author: 'John Doe',
-      comment: '',
-      date: dayjs().format('YYYY/MM/DD HH:MM'),
-      emotion: '',
-      isEmotion: BLANK_COMMENT.emotion !== null,
-      isNewComment: BLANK_COMMENT.comment !== null,
+      textComment: '',
+      emotionComment: '',
+      // authorComment: 'John Doe',
+      // dateComment: dayjs().format('YYYY/MM/DD HH:MM'),
     }
   );
 
   static parseStateToFilm = (state) => {
-    const film = {...state};
+    const film = {...state,
+      comments: state.comments.push(state.comments.length + 1),};
 
     return film;
   };
