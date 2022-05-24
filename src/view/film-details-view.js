@@ -3,7 +3,8 @@ import {humanizeFilmReleaseDate} from '../utils/film.js';
 import {getTimeFromMins} from '../utils/common.js';
 import {EMOTIONS} from '../const.js';
 import {generateComment} from '../mock/comments.js';
-import dayjs from 'dayjs';
+// import dayjs from 'dayjs';
+// import {render} from '../framework/render.js';
 
 
 const createGenresTemplate = (genres) => {
@@ -41,6 +42,7 @@ const createEmotionsTemplate = () => EMOTIONS.map((el) => (
     <label class="film-details__emoji-label" for="emoji-${el}">
       <img src="./images/emoji/${el}.png" width="30" height="30" alt="emoji-${el}">
     </label>`)).join('');
+
 
 const createFilmPopupTemplate = (film) => {
   const filmInfo = film['film_info'];
@@ -162,12 +164,26 @@ export default class FilmPopupView extends AbstractStatefulView {
 
     this._state = FilmPopupView.parseFilmToState(film);
     this.#setInnerHandlers();
-    // console.log(FilmPopupView.parseFilmToState(film));
   }
 
   get template() {
     return createFilmPopupTemplate(this._state);
   }
+
+  // createNewCommentsTemplate = (comment) => (
+  //   `<li class="film-details__comment">
+  //     <span class="film-details__comment-emoji">
+  //       <img src="./images/emoji/${comment.emotion}.png" width="55" height="55" alt="emoji-${comment.emotion}">
+  //     </span>
+  //     <div>
+  //       <p class="film-details__comment-text">${comment.comment}</p>
+  //       <p class="film-details__comment-info">
+  //         <span class="film-details__comment-author">${comment.author}</span>
+  //         <span class="film-details__comment-day">${comment.date}</span>
+  //         <button class="film-details__comment-delete">Delete</button>
+  //       </p>
+  //     </div>
+  //   </li>`);
 
   setCloseClickHandler = (callback) => {
     this._callback.closeClick = callback;
@@ -234,9 +250,17 @@ export default class FilmPopupView extends AbstractStatefulView {
   };
 
   #formSubmitHandler = (evt) => {
+    // const newComment = {
+    //   id: this._state.comments.length + 1,
+    //   comment: this._state.textComment,
+    //   emotion: this._state.emotionComment,
+    //   date: dayjs().format('YYYY/MM/DD HH:MM'),
+    //   author: 'John Doe',
+    // };
+
     if (evt.ctrlKey && evt.key === 'Enter') {
       this._callback.formSubmit(FilmPopupView.parseStateToFilm(this._state));
-      // console.log(FilmPopupView.parseStateToFilm(this._state));
+      // render(this.createNewCommentsTemplate(newComment), this.element.querySelector('.film-details__comments-list'));
     }
   };
 
@@ -260,8 +284,8 @@ export default class FilmPopupView extends AbstractStatefulView {
     //   date: dayjs().format('YYYY/MM/DD HH:MM'),
     //   author: 'John Doe',
     // };
-    state.comments.push(state.comments.length + 1);
-    console.log(state.comments);
+
+    // state.comments.push(state.comments.length + 1);
 
     const film = {...state,
       comments: state.comments};
