@@ -1,5 +1,4 @@
 import dayjs from 'dayjs';
-import {SortType} from '../const.js';
 
 const humanizeFilmReleaseDate = (releaseDate) => dayjs(releaseDate).format('D MMMM YYYY');
 const humanizeFilmReleaseYear = (releaseDate) => dayjs(releaseDate).format('YYYY');
@@ -46,12 +45,6 @@ const sortFilmByRating = (filmA, filmB) => {
   const weight = getWeightForNullDate(filmA['film_info']['total_rating'], filmB['film_info']['total_rating']);
 
   return weight ?? filmB['film_info']['total_rating'] - filmA['film_info']['total_rating'];
-};
-
-export const sortings = {
-  [SortType.DATE]: (films) => [...films].sort(sortFilmByDate),
-  [SortType.RATING]: (films) => [...films].sort(sortFilmByRating),
-  [SortType.DEFAULT]: (films) => films,
 };
 
 export {humanizeFilmReleaseDate, humanizeFilmReleaseYear, sortFilmByDate, sortFilmByRating};

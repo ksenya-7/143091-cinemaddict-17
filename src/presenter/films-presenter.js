@@ -77,7 +77,6 @@ export default class FilmsPresenter {
         this.#listFilms = [...this.#sourcedListFilms];
     }
 
-    // this.#listFilms = sortings[sortType](this.#listFilms);
     this.#currentSortType = sortType;
   };
 
