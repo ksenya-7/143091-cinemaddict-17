@@ -2,9 +2,7 @@ import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import {humanizeFilmReleaseDate} from '../utils/film.js';
 import {getTimeFromMins} from '../utils/common.js';
 import {EMOTIONS} from '../const.js';
-import {generateComment} from '../mock/comments.js';
-// import dayjs from 'dayjs';
-// import {render} from '../framework/render.js';
+import dayjs from 'dayjs';
 
 
 const createGenresTemplate = (genres) => {
@@ -17,24 +15,21 @@ const createGenresTemplate = (genres) => {
   );
 };
 
-const createCommentsTemplate = (comments) => comments.map((comment) => {
-  const commentById = generateComment(comment);
-
-  return (
-    `<li class="film-details__comment">
+const createCommentsTemplate = (comments) => comments.map((comment) => (
+  `<li class="film-details__comment">
       <span class="film-details__comment-emoji">
-        <img src="./images/emoji/${commentById.emotion}.png" width="55" height="55" alt="emoji-${commentById.emotion}">
+        <img src="./images/emoji/${comment.emotion}.png" width="55" height="55" alt="emoji-${comment.emotion}">
       </span>
       <div>
-        <p class="film-details__comment-text">${commentById.comment}</p>
+        <p class="film-details__comment-text">${comment.comment}</p>
         <p class="film-details__comment-info">
-          <span class="film-details__comment-author">${commentById.author}</span>
-          <span class="film-details__comment-day">${commentById.date}</span>
+          <span class="film-details__comment-author">${comment.author}</span>
+          <span class="film-details__comment-day">${comment.date}</span>
           <button class="film-details__comment-delete">Delete</button>
         </p>
       </div>
-    </li>`);
-}).join('');
+    </li>`)
+).join('');
 
 
 const createEmotionsTemplate = () => EMOTIONS.map((el) => (
@@ -56,7 +51,7 @@ const createFilmPopupTemplate = (film) => {
   const genresTemplate = createGenresTemplate(genre);
 
   const comments = film.comments;
-  const commentsTemplate = createCommentsTemplate(comments);
+  const commentsTemplate = createCommentsTemplate(film.comments);
 
   const watchlistClassName = film.watchlist ? 'film-details__control-button--active' : '';
   const watchedClassName = film.watched ? 'film-details__control-button--active' : '';
@@ -138,13 +133,14 @@ const createFilmPopupTemplate = (film) => {
             <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
             <ul class="film-details__comments-list">
               ${commentsTemplate}
+
             </ul>
             <div class="film-details__new-comment">
-              <div class="film-details__add-emoji-label">${film.emotionComment ? `<img src="./images/emoji/${film.emotionComment}.png" width="55" height="55" alt="emoji">` : ''}
+              <div class="film-details__add-emoji-label">${film.commentEmotion ? `<img src="./images/emoji/${film.commentEmotion}.png" width="55" height="55" alt="emoji">` : ''}
               </div>
 
               <label class="film-details__comment-label">
-                <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${film.textComment ? `${film.textComment}` : ''}</textarea>
+                <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${film.commentText ? `${film.commentText}` : ''}</textarea>
               </label>
 
               <div class="film-details__emoji-list">
@@ -169,21 +165,6 @@ export default class FilmPopupView extends AbstractStatefulView {
   get template() {
     return createFilmPopupTemplate(this._state);
   }
-
-  // createNewCommentsTemplate = (comment) => (
-  //   `<li class="film-details__comment">
-  //     <span class="film-details__comment-emoji">
-  //       <img src="./images/emoji/${comment.emotion}.png" width="55" height="55" alt="emoji-${comment.emotion}">
-  //     </span>
-  //     <div>
-  //       <p class="film-details__comment-text">${comment.comment}</p>
-  //       <p class="film-details__comment-info">
-  //         <span class="film-details__comment-author">${comment.author}</span>
-  //         <span class="film-details__comment-day">${comment.date}</span>
-  //         <button class="film-details__comment-delete">Delete</button>
-  //       </p>
-  //     </div>
-  //   </li>`);
 
   setCloseClickHandler = (callback) => {
     this._callback.closeClick = callback;
@@ -236,31 +217,21 @@ export default class FilmPopupView extends AbstractStatefulView {
   };
 
   #emotionChangeHandler = (evt) => {
-    evt.preventDefault();
     this.updateElement({
-      emotionComment: evt.target.value,
+      commentEmotion: evt.target.value,
     });
   };
 
   #commentInputHandler = (evt) => {
     evt.preventDefault();
     this._setState({
-      textComment: evt.target.value,
+      commentText: evt.target.value,
     });
   };
 
   #formSubmitHandler = (evt) => {
-    // const newComment = {
-    //   id: this._state.comments.length + 1,
-    //   comment: this._state.textComment,
-    //   emotion: this._state.emotionComment,
-    //   date: dayjs().format('YYYY/MM/DD HH:MM'),
-    //   author: 'John Doe',
-    // };
-
     if (evt.ctrlKey && evt.key === 'Enter') {
-      this._callback.formSubmit(FilmPopupView.parseStateToFilm(this._state));
-      // render(this.createNewCommentsTemplate(newComment), this.element.querySelector('.film-details__comments-list'));
+      this._callback.formSubmit(FilmPopupView.parseStateToFilm(this._state), FilmPopupView.parseNewComments(this._state));
     }
   };
 
@@ -271,28 +242,32 @@ export default class FilmPopupView extends AbstractStatefulView {
 
   static parseFilmToState = (film) => (
     {...film,
-      textComment: '',
-      emotionComment: '',
+      commentText: '',
+      commentEmotion: '',
     }
   );
 
   static parseStateToFilm = (state) => {
-    // const newComment = {
-    //   id: state.comments.length + 1,
-    //   comment: state.textComment,
-    //   emotion: state.emotionComment,
-    //   date: dayjs().format('YYYY/MM/DD HH:MM'),
-    //   author: 'John Doe',
-    // };
-
-    // state.comments.push(state.comments.length + 1);
+    state.comments.push({
+      id: state.comments.length + 1,
+      author: 'John Doe',
+      comment: state.commentText,
+      date: dayjs().format('YYYY/MM/DD HH:MM'),
+      emotion: state.commentEmotion,
+    });
 
     const film = {...state,
-      comments: state.comments};
+      comments: state.comments
+    };
 
-    delete film.textComment;
-    delete film.emotionComment;
+    delete film.commentText;
+    delete film.commentEmotion;
 
     return film;
+  };
+
+  static parseNewComments = (state) => {
+    const newComments = state.comments;
+    return newComments;
   };
 }

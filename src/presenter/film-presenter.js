@@ -14,7 +14,6 @@ export default class FilmPresenter {
     this.#filmListContainer = filmListContainer;
     this.#openFilmPopup = openFilmPopup;
     this.#changeData = changeData;
-    // this.#changePopupData = changePopupData;
   }
 
   init = (film) => {
