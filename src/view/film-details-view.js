@@ -18,7 +18,7 @@ const createGenresTemplate = (genres) => {
 const createCommentsTemplate = (comments) => comments.map((comment) => (
   `<li class="film-details__comment">
       <span class="film-details__comment-emoji">
-        <img src="./images/emoji/${comment.emotion}.png" width="55" height="55" alt="emoji-${comment.emotion}">
+        ${comment.emotion ? `<img src="./images/emoji/${comment.emotion}.png" width="55" height="55" alt="emoji-${comment.emotion}">` : ''}
       </span>
       <div>
         <p class="film-details__comment-text">${comment.comment}</p>
@@ -30,7 +30,6 @@ const createCommentsTemplate = (comments) => comments.map((comment) => (
       </div>
     </li>`)
 ).join('');
-
 
 const createEmotionsTemplate = () => EMOTIONS.map((el) => (
   `<input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${el}" value="${el}">
