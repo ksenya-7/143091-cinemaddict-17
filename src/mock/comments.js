@@ -1,65 +1,82 @@
-import {getRandomInteger} from '../utils/common.js';
+// const date = (index) => {
+//   const dates = [
+//     '2019/12/31 23:59',
+//     '2 days ago',
+//     '2 days ago',
+//     'Today',
+//   ];
 
-const generateDate = () => {
-  const dates = [
-    '1933-05-10T16:12:12.554Z',
-    '1935-04-11T16:13:22.554Z',
-    '1937-06-12T16:14:32.554Z',
-    '2019-07-13T16:12:42.554Z',
-    '1960-08-14T16:15:52.554Z',
-    '2020-09-15T16:16:35.554Z',
-    '2015-10-16T16:17:36.554Z',
-    '1955-12-17T16:18:37.554Z',
-  ];
+//   return dates[index - 1];
+// };
 
-  const randomIndex = getRandomInteger(0, dates.length - 1);
+// const author = (index) => {
+//   const authors = [
+//     'Tim Macoveev',
+//     'John Doe',
+//     'John Doe',
+//     'John Doe',
+//   ];
 
-  return dates[randomIndex];
-};
+//   return authors[index - 1];
+// };
 
-const generateAuthor = () => {
-  const authors = [
-    'Ilya O\u0027Reilly',
-    'Tim Macoveev',
-    'John Doe',
-  ];
+// const emotion = (index) => {
+//   const emotions = [
+//     'smile',
+//     'sleeping',
+//     'puke',
+//     'angry',
+//   ];
 
-  const randomIndex = getRandomInteger(0, authors.length - 1);
+//   return emotions[index - 1];
+// };
 
-  return authors[randomIndex];
-};
+// const textComment = (index) => {
+//   const textComments = [
+//     'Interesting setting and a good cast',
+//     'Booooooooooring',
+//     'Very very old. Meh',
+//     'Almost two hours? Seriously?',
+//   ];
 
-const generateEmotion = () => {
-  const emotions = [
-    'smile',
-    'sleeping',
-    'puke',
-    'angry',
-  ];
+//   return textComments[index - 1];
+// };
 
-  const randomIndex = getRandomInteger(0, emotions.length - 1);
+// export const generateComment = (index) => ({
+//   id: index,
+//   author: author(index),
+//   comment: textComment(index),
+//   date: date(index),
+//   emotion: emotion(index),
+// });
 
-  return emotions[randomIndex];
-};
-
-const generateTextComment = () => {
-  const textComments = [
-    'a film that changed my life, a true masterpiece, post-credit scene was just amazing omg.',
-    'Interesting setting and a good cast',
-    'Booooooooooring',
-    'Very very old. Meh',
-    'Almost two hours? Seriously?',
-  ];
-
-  const randomIndex = getRandomInteger(0, textComments.length - 1);
-
-  return textComments[randomIndex];
-};
-
-export const generateComment = (index) => ({
-  'id': index,
-  'author': generateAuthor(),
-  'comment': generateTextComment(),
-  'date': generateDate(),
-  'emotion': generateEmotion(),
-});
+export const comments = [
+  {
+    'id': 1,
+    'author': 'Tim Macoveev',
+    'comment': 'Interesting setting and a good cast',
+    'date': '2019/12/31 23:59',
+    'emotion': 'smile',
+  },
+  {
+    'id': 2,
+    'author': 'John Doe',
+    'comment': 'Booooooooooring',
+    'date': '2 days ago',
+    'emotion': 'sleeping',
+  },
+  {
+    'id': 3,
+    'author': 'John Doe',
+    'comment': 'Very very old. Meh',
+    'date': '2 days ago',
+    'emotion': 'puke',
+  },
+  {
+    'id': 4,
+    'author': 'John Doe',
+    'comment': 'Almost two hours? Seriously?',
+    'date': 'Today',
+    'emotion': 'angry',
+  },
+];
