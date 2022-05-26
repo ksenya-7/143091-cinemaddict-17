@@ -4,6 +4,21 @@ import {getTimeFromMins} from '../utils/common.js';
 import {EMOTIONS} from '../const.js';
 import dayjs from 'dayjs';
 
+const commentDateDiff = (item) => {
+  const diff = dayjs().diff(item, 'day');
+
+  if (item.includes('day')) {
+    return item;
+  } else if (diff === 0) {
+    return 'Today';
+  } else if (diff === 1) {
+    return 'A day ago';
+  } else if (diff > 31) {
+    return item;
+  } else {
+    return `A ${diff} days ago`;
+  }
+};
 
 const createGenresTemplate = (genres) => {
   const createSpansTemplate = () => genres.map((element) => (`<span class="film-details__genre">${element}</span>`)).join('');
@@ -15,8 +30,11 @@ const createGenresTemplate = (genres) => {
   );
 };
 
-const createCommentsTemplate = (comments) => comments.map((comment) => (
-  `<li class="film-details__comment">
+const createCommentsTemplate = (comments) => comments.map((comment) => {
+  const commentDate = commentDateDiff(comment.date);
+
+  return (
+    `<li class="film-details__comment">
       <span class="film-details__comment-emoji">
         ${comment.emotion ? `<img src="./images/emoji/${comment.emotion}.png" width="55" height="55" alt="emoji-${comment.emotion}">` : ''}
       </span>
@@ -24,12 +42,12 @@ const createCommentsTemplate = (comments) => comments.map((comment) => (
         <p class="film-details__comment-text">${comment.comment}</p>
         <p class="film-details__comment-info">
           <span class="film-details__comment-author">${comment.author}</span>
-          <span class="film-details__comment-day">${comment.date}</span>
+          <span class="film-details__comment-day">${commentDate}</span>
           <button class="film-details__comment-delete">Delete</button>
         </p>
       </div>
-    </li>`)
-).join('');
+    </li>`);
+}).join('');
 
 const createEmotionsTemplate = () => EMOTIONS.map((el) => (
   `<input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${el}" value="${el}">
