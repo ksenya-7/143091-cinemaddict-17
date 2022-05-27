@@ -248,7 +248,7 @@ export default class FilmPopupView extends AbstractStatefulView {
 
   #formSubmitHandler = (evt) => {
     if (evt.ctrlKey && evt.key === 'Enter') {
-      this._callback.formSubmit(FilmPopupView.parseStateToFilm(this._state), FilmPopupView.parseNewComments(this._state));
+      this._callback.formSubmit(FilmPopupView.parseStateToFilm(this._state), FilmPopupView.parseNewComments(this._state.comments));
     }
   };
 
@@ -281,10 +281,5 @@ export default class FilmPopupView extends AbstractStatefulView {
     delete film.commentEmotion;
 
     return film;
-  };
-
-  static parseNewComments = (state) => {
-    const newComments = state.comments;
-    return newComments;
   };
 }
