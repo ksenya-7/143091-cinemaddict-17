@@ -248,7 +248,7 @@ export default class FilmPopupView extends AbstractStatefulView {
 
   #formSubmitHandler = (evt) => {
     if (evt.ctrlKey && evt.key === 'Enter') {
-      this._callback.formSubmit(FilmPopupView.parseStateToFilm(this._state), FilmPopupView.parseNewComments(this._state.comments));
+      this._callback.formSubmit(FilmPopupView.parseStateToFilm(this._state), this._state.comments);
     }
   };
 
