@@ -48,10 +48,4 @@ const sortFilmByRating = (filmA, filmB) => {
   return weight ?? filmB['film_info']['total_rating'] - filmA['film_info']['total_rating'];
 };
 
-export const sortings = {
-  [SortType.DATE]: (films) => [...films].sort(sortFilmByDate),
-  [SortType.RATING]: (films) => [...films].sort(sortFilmByRating),
-  [SortType.DEFAULT]: (films) => films,
-};
-
 export {humanizeFilmReleaseDate, humanizeFilmReleaseYear, sortFilmByDate, sortFilmByRating};
