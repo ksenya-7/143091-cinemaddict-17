@@ -1,5 +1,4 @@
 import dayjs from 'dayjs';
-import {SortType} from '../const.js';
 
 const humanizeFilmReleaseDate = (releaseDate) => dayjs(releaseDate).format('D MMMM YYYY');
 const humanizeFilmReleaseYear = (releaseDate) => dayjs(releaseDate).format('YYYY');

@@ -3,6 +3,7 @@ import {humanizeFilmReleaseDate} from '../utils/film.js';
 import {getTimeFromMins} from '../utils/common.js';
 import {EMOTIONS} from '../const.js';
 import dayjs from 'dayjs';
+import he from 'he';
 
 
 const createGenresTemplate = (genres) => {
@@ -134,7 +135,7 @@ const createFilmPopupTemplate = (film) => {
               </table>
 
               <p class="film-details__film-description">
-                ${filmInfo['description']}
+                ${he.encode(filmInfo['description'])}
               </p>
             </div>
           </div>
@@ -178,7 +179,7 @@ export default class FilmPopupView extends AbstractStatefulView {
 
     this._state = FilmPopupView.parseFilmToState(film);
     this.#setInnerHandlers();
-    this.setDeleteClickHandler();
+    this.#setDeleteClickHandler();
   }
 
   get template() {
@@ -210,6 +211,15 @@ export default class FilmPopupView extends AbstractStatefulView {
     document.addEventListener('keydown', this.#formSubmitHandler);
   };
 
+  #setDeleteClickHandler = (callback) => {
+    this._callback.deleteClick = callback;
+
+    const deleteButtons = this.element.querySelectorAll('.film-details__comment-delete');
+    deleteButtons.forEach((button) => {
+      button.addEventListener('click', this.#commentDeleteClickHandler);
+    });
+  };
+
   #closeClickHandler = () => {
     this._callback.closeClick();
   };
@@ -226,15 +236,6 @@ export default class FilmPopupView extends AbstractStatefulView {
     this._callback.favoritePopupClick();
   };
 
-  setDeleteClickHandler = (callback) => {
-    this._callback.deleteClick = callback;
-
-    const deleteButtons = this.element.querySelectorAll('.film-details__comment-delete');
-    deleteButtons.forEach((button) => {
-      button.addEventListener('click', this.#commentDeleteClickHandler);
-    });
-  };
-
   _restoreHandlers = () => {
     this.#setInnerHandlers();
     this.setCloseClickHandler(this._callback.closeClick);
@@ -242,7 +243,7 @@ export default class FilmPopupView extends AbstractStatefulView {
     this.setWatchedPopupClickHandler(this._callback.watchedPopupClick);
     this.setFavoritePopupClickHandler(this._callback.favoritePopupClick);
     this.setFormSubmitHandler(this._callback.formSubmit);
-    this.setDeleteClickHandler(this._callback.deleteClick);
+    this.#setDeleteClickHandler(this._callback.deleteClick);
   };
 
   #emotionChangeHandler = (evt) => {
@@ -271,11 +272,10 @@ export default class FilmPopupView extends AbstractStatefulView {
 
   #commentDeleteClickHandler = (evt) => {
     evt.preventDefault();
-    const idDelete = evt.target.dataset.buttonDelete;
-    const index = this._state.comments.findIndex((comment) => comment.id === idDelete);
-    // this._state.comments.forEach((comment) => console.log(comment.id));
-    // console.log(index);
-    // const index = 1;
+    const idDelete = Number(evt.target.dataset.buttonDelete);
+
+    const index = this._state.comments.findIndex((item) => item.id === idDelete);
+
     this._state.comments = [
       ...this._state.comments.slice(0, index),
       ...this._state.comments.slice(index + 1),

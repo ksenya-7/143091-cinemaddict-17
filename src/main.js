@@ -14,7 +14,7 @@ const filmsModel = new FilmsModel();
 const filterModel = new FilterModel();
 const filterPresenter = new FilterPresenter(siteMainElement, filterModel, filmsModel);
 
-const filmsPresenter = new FilmsPresenter(siteMainElement, filmsModel);
+const filmsPresenter = new FilmsPresenter(siteMainElement, filmsModel, filterModel);
 
 render(new ProfileButtonView(), siteHeaderElement);
 render(new StatisticsView(), siteFooterElement);

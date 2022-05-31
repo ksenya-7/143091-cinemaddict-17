@@ -8,7 +8,8 @@ import FilmPopupView from '../view/film-details-view.js';
 import SortView from '../view/sort-view.js';
 import FilmPresenter from './film-presenter.js';
 import {sortFilmByDate, sortFilmByRating} from '../utils/film.js';
-import {SortType, UpdateType, UserAction} from '../const.js';
+import {filter} from '../utils/filter.js';
+import {SortType, UpdateType, UserAction, FilterType} from '../const.js';
 import CommentsModel from '../model/comments-model.js';
 
 const FILM_COUNT_PER_STEP = 5;
@@ -17,12 +18,13 @@ const body = document.querySelector('body');
 export default class FilmsPresenter {
   #filmsContainer = null;
   #filmsModel = null;
+  #filterModel = null;
   #filmPopupComponent = null;
 
   #filmsComponent = new FilmsView();
   #filmsListComponent = new FilmsListView();
   #filmsContainerComponent = new FilmsContainerView();
-  #noFilmComponent = new FilmsEmptyView();
+  #noFilmComponent = null;
   #sortComponent = null;
   #showMoreButtonComponent = null;
 
@@ -33,22 +35,30 @@ export default class FilmsPresenter {
 
   #currentSortType = SortType.DEFAULT;
   #commentsModel = new CommentsModel();
+  #filterType = FilterType.ALL;
 
-  constructor(filmsContainer, filmsModel) {
+  constructor(filmsContainer, filmsModel, filterModel) {
     this.#filmsContainer = filmsContainer;
     this.#filmsModel = filmsModel;
+    this.#filterModel = filterModel;
+
     this.#filmsModel.addObserver(this.#handleModelEvent);
+    this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
   get films() {
+    this.#filterType = this.#filterModel.filter;
+    const films = this.#filmsModel.films;
+    const filteredFilms = filter[this.#filterType](films);
+
     switch (this.#currentSortType) {
       case SortType.DATE:
-        return [...this.#filmsModel.films].sort(sortFilmByDate);
+        return filteredFilms.sort(sortFilmByDate);
       case SortType.RATING:
-        return [...this.#filmsModel.films].sort(sortFilmByRating);
+        return filteredFilms.sort(sortFilmByRating);
     }
 
-    return this.#filmsModel.films;
+    return filteredFilms;
   }
 
   init = () => {
@@ -105,7 +115,7 @@ export default class FilmsPresenter {
 
     this.#currentSortType = sortType;
 
-    this.#clearBoard({resetRenderedTaskCount: true});
+    this.#clearBoard({resetRenderedFilmCount: true});
     this.#renderFilmsComponent();
   };
 
@@ -128,6 +138,7 @@ export default class FilmsPresenter {
   };
 
   #renderNoFilms = () => {
+    this.#noFilmComponent = new FilmsEmptyView(this.#filterType);
     render(this.#noFilmComponent, this.#filmsComponent.element, RenderPosition.AFTERBEGIN);
   };
 
@@ -151,7 +162,6 @@ export default class FilmsPresenter {
     this.#filmPopupComponent.setWatchedPopupClickHandler(this.#watchedPopupClickHandler);
     this.#filmPopupComponent.setFavoritePopupClickHandler(this.#favoritePopupClickHandler);
     this.#filmPopupComponent.setFormSubmitHandler(this.#handleFormSubmit);
-    // this.#filmPopupComponent.setDeleteClickHandler(this.#handleDeleteClick);
     render(this.#filmPopupComponent, body);
 
     document.addEventListener('keydown', this.#handleKeyDown);
@@ -183,6 +193,10 @@ export default class FilmsPresenter {
     remove(this.#noFilmComponent);
     remove(this.#showMoreButtonComponent);
 
+    if (this.#noFilmComponent) {
+      remove(this.#noFilmComponent);
+    }
+
     if (resetRenderedFilmCount) {
       this.#renderedFilmCount = FILM_COUNT_PER_STEP;
     } else {
@@ -195,7 +209,7 @@ export default class FilmsPresenter {
   };
 
   #renderFilmsComponent = () => {
-    const films = this.films;
+    // const films = this.films;
     const filmCount = this.films.length;
 
     render(this.#filmsComponent, this.#filmsContainer);
@@ -209,7 +223,7 @@ export default class FilmsPresenter {
 
     render(this.#filmsListComponent, this.#filmsComponent.element);
     render(this.#filmsContainerComponent, this.#filmsListComponent.element);
-    this.#renderFilms(films.slice(0, Math.min(filmCount, this.#renderedFilmCount)));
+    this.#renderFilms(this.films.slice(0, Math.min(filmCount, this.#renderedFilmCount)));
 
     if (filmCount > this.#renderedFilmCount) {
       this.#renderShowMoreButton();
