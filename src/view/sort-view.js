@@ -25,21 +25,6 @@ export default class SortView extends AbstractView {
     this.element.addEventListener('click', this.#sortTypeChangeHandler);
   };
 
-  // #disactiveButtons = (buttons) => buttons.forEach((button) => button.classList.remove('sort__button--active'));
-
-  // #sortTypeChangeHandler = (evt) => {
-  //   // const target = evt.target;
-
-  //   if (target.tagName !== 'A') {
-  //     return;
-  //   }
-
-  //   evt.preventDefault();
-  //   this._callback.sortTypeChange(target.dataset.sortType);
-  //   // this.#disactiveButtons(this.element.querySelectorAll('.sort__button'));
-  //   // target.classList.add('sort__button--active');
-  // };
-
   #sortTypeChangeHandler = (evt) => {
     if (evt.target.tagName !== 'A') {
       return;

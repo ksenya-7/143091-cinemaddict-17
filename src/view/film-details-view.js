@@ -44,7 +44,7 @@ const createCommentsTemplate = (comments) => comments.map((comment) => {
         <p class="film-details__comment-info">
           <span class="film-details__comment-author">${comment.author}</span>
           <span class="film-details__comment-day">${commentDate}</span>
-          <button class="film-details__comment-delete">Delete</button>
+          <button class="film-details__comment-delete" data-button-delete="${comment.id}">Delete</button>
         </p>
       </div>
     </li>`);
@@ -178,6 +178,7 @@ export default class FilmPopupView extends AbstractStatefulView {
 
     this._state = FilmPopupView.parseFilmToState(film);
     this.#setInnerHandlers();
+    this.setDeleteClickHandler();
   }
 
   get template() {
@@ -225,6 +226,15 @@ export default class FilmPopupView extends AbstractStatefulView {
     this._callback.favoritePopupClick();
   };
 
+  setDeleteClickHandler = (callback) => {
+    this._callback.deleteClick = callback;
+
+    const deleteButtons = this.element.querySelectorAll('.film-details__comment-delete');
+    deleteButtons.forEach((button) => {
+      button.addEventListener('click', this.#commentDeleteClickHandler);
+    });
+  };
+
   _restoreHandlers = () => {
     this.#setInnerHandlers();
     this.setCloseClickHandler(this._callback.closeClick);
@@ -232,6 +242,7 @@ export default class FilmPopupView extends AbstractStatefulView {
     this.setWatchedPopupClickHandler(this._callback.watchedPopupClick);
     this.setFavoritePopupClickHandler(this._callback.favoritePopupClick);
     this.setFormSubmitHandler(this._callback.formSubmit);
+    this.setDeleteClickHandler(this._callback.deleteClick);
   };
 
   #emotionChangeHandler = (evt) => {
@@ -256,6 +267,23 @@ export default class FilmPopupView extends AbstractStatefulView {
   #setInnerHandlers = () => {
     this.element.querySelector('.film-details__emoji-list').addEventListener('change', this.#emotionChangeHandler);
     this.element.querySelector('.film-details__comment-input').addEventListener('input', this.#commentInputHandler);
+  };
+
+  #commentDeleteClickHandler = (evt) => {
+    evt.preventDefault();
+    const idDelete = evt.target.dataset.buttonDelete;
+    const index = this._state.comments.findIndex((comment) => comment.id === idDelete);
+    // this._state.comments.forEach((comment) => console.log(comment.id));
+    // console.log(index);
+    // const index = 1;
+    this._state.comments = [
+      ...this._state.comments.slice(0, index),
+      ...this._state.comments.slice(index + 1),
+    ];
+
+    this.updateElement({
+      ...this._state
+    });
   };
 
   static parseFilmToState = (film) => (

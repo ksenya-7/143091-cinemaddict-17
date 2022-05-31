@@ -9,7 +9,6 @@ export default class FilmPresenter {
 
   #film = null;
   #changeData = null;
-  #changePopupData = null;
 
   constructor(filmListContainer, openFilmPopup, changeData) {
     this.#filmListContainer = filmListContainer;

@@ -151,6 +151,7 @@ export default class FilmsPresenter {
     this.#filmPopupComponent.setWatchedPopupClickHandler(this.#watchedPopupClickHandler);
     this.#filmPopupComponent.setFavoritePopupClickHandler(this.#favoritePopupClickHandler);
     this.#filmPopupComponent.setFormSubmitHandler(this.#handleFormSubmit);
+    // this.#filmPopupComponent.setDeleteClickHandler(this.#handleDeleteClick);
     render(this.#filmPopupComponent, body);
 
     document.addEventListener('keydown', this.#handleKeyDown);
