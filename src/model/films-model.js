@@ -8,6 +8,10 @@ export default class FilmsModel extends Observable {
     return this.#films;
   }
 
+  set films(value) {
+    this.#films = value;
+  }
+
   updateFilm = (updateType, update) => {
     const index = this.#films.findIndex((film) => film.id === update.id);
 
@@ -24,27 +28,27 @@ export default class FilmsModel extends Observable {
     this._notify(updateType, update);
   };
 
-  addFilm = (updateType, update) => {
-    this.#films = [
-      update,
-      ...this.#films,
-    ];
+  // addFilm = (updateType, update) => {
+  //   this.#films = [
+  //     update,
+  //     ...this.#films,
+  //   ];
 
-    this._notify(updateType, update);
-  };
+  //   this._notify(updateType, update);
+  // };
 
-  deleteFilm = (updateType, update) => {
-    const index = this.#films.findIndex((film) => film.id === update.id);
+  // deleteFilm = (updateType, update) => {
+  //   const index = this.#films.findIndex((film) => film.id === update.id);
 
-    if (index === -1) {
-      throw new Error('Can\'t delete unexisting film');
-    }
+  //   if (index === -1) {
+  //     throw new Error('Can\'t delete unexisting film');
+  //   }
 
-    this.#films = [
-      ...this.#films.slice(0, index),
-      ...this.#films.slice(index + 1),
-    ];
+  //   this.#films = [
+  //     ...this.#films.slice(0, index),
+  //     ...this.#films.slice(index + 1),
+  //   ];
 
-    this._notify(updateType);
-  };
+  //   this._notify(updateType);
+  // };
 }
