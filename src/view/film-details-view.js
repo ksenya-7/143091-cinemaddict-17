@@ -5,6 +5,21 @@ import {EMOTIONS} from '../const.js';
 import dayjs from 'dayjs';
 import he from 'he';
 
+const commentDateDiff = (item) => {
+  const diff = dayjs().diff(item, 'day');
+
+  if (item.includes('day')) {
+    return item;
+  } else if (diff === 0) {
+    return 'Today';
+  } else if (diff === 1) {
+    return 'A day ago';
+  } else if (diff > 31) {
+    return item;
+  } else {
+    return `A ${diff} days ago`;
+  }
+};
 
 const createGenresTemplate = (genres) => {
   const createSpansTemplate = () => genres.map((element) => (`<span class="film-details__genre">${element}</span>`)).join('');
@@ -15,6 +30,7 @@ const createGenresTemplate = (genres) => {
     `
   );
 };
+
 
 const commentDateDiff = (item) => {
   const diff = dayjs().diff(item, 'day');
@@ -45,7 +61,9 @@ const createCommentsTemplate = (comments) => comments.map((comment) => {
         <p class="film-details__comment-info">
           <span class="film-details__comment-author">${comment.author}</span>
           <span class="film-details__comment-day">${commentDate}</span>
+
           <button class="film-details__comment-delete" data-button-delete="${comment.id}">Delete</button>
+
         </p>
       </div>
     </li>`);
