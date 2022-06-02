@@ -99,9 +99,6 @@ export default class FilmsPresenter {
         this.#renderFilmsComponent();
         break;
     }
-
-
-    this.#currentSortType = sortType;
   };
 
   #handleSortTypeChange = (sortType) => {

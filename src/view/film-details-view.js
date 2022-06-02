@@ -31,23 +31,6 @@ const createGenresTemplate = (genres) => {
   );
 };
 
-
-const commentDateDiff = (item) => {
-  const diff = dayjs().diff(item, 'day');
-
-  if (item.includes('day')) {
-    return item;
-  } else if (diff === 0) {
-    return 'Today';
-  } else if (diff === 1) {
-    return 'A day ago';
-  } else if (diff > 31) {
-    return item;
-  } else {
-    return `A ${diff} days ago`;
-  }
-};
-
 const createCommentsTemplate = (comments) => comments.map((comment) => {
   const commentDate = commentDateDiff(comment.date);
 
