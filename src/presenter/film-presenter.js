@@ -1,6 +1,6 @@
 import {render, replace, remove} from '../framework/render.js';
 import FilmCardView from '../view/film-card-view.js';
-import {UserAction, UpdateType} from '../const.js';
+import {UpdateType} from '../const.js';
 
 export default class FilmPresenter {
   #filmListContainer = null;
@@ -8,12 +8,12 @@ export default class FilmPresenter {
   #filmComponent = null;
 
   #film = null;
-  #changeData = null;
+  #filmsModel = null;
 
-  constructor(filmListContainer, openFilmPopup, changeData) {
+  constructor(filmListContainer, openFilmPopup, filmsModel) {
     this.#filmListContainer = filmListContainer;
     this.#openFilmPopup = openFilmPopup;
-    this.#changeData = changeData;
+    this.#filmsModel = filmsModel;
   }
 
   init = (film) => {
@@ -48,24 +48,21 @@ export default class FilmPresenter {
   };
 
   #handleWatchlistClick = () => {
-    this.#changeData(
-      UserAction.UPDATE_FILM,
+    this.#filmsModel.updateFilm(
       UpdateType.MINOR,
       {...this.#film, watchlist: !this.#film.watchlist},
     );
   };
 
   #handleWatchedClick = () => {
-    this.#changeData(
-      UserAction.UPDATE_FILM,
+    this.#filmsModel.updateFilm(
       UpdateType.MINOR,
       {...this.#film, watched: !this.#film.watched},
     );
   };
 
   #handleFavoriteClick = () => {
-    this.#changeData(
-      UserAction.UPDATE_FILM,
+    this.#filmsModel.updateFilm(
       UpdateType.MINOR,
       {...this.#film, favorite: !this.#film.favorite},
     );

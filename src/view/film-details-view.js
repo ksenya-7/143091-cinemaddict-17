@@ -8,14 +8,12 @@ import he from 'he';
 const commentDateDiff = (item) => {
   const diff = dayjs().diff(item, 'day');
 
-  if (item.includes('day')) {
+  if (item.includes('day') || diff > 31) {
     return item;
   } else if (diff === 0) {
     return 'Today';
   } else if (diff === 1) {
     return 'A day ago';
-  } else if (diff > 31) {
-    return item;
   } else {
     return `A ${diff} days ago`;
   }

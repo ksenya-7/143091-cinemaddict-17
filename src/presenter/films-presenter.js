@@ -9,7 +9,7 @@ import SortView from '../view/sort-view.js';
 import FilmPresenter from './film-presenter.js';
 import {sortFilmByDate, sortFilmByRating} from '../utils/film.js';
 import {filter} from '../utils/filter.js';
-import {SortType, UpdateType, UserAction, FilterType} from '../const.js';
+import {SortType, UpdateType, FilterType} from '../const.js';
 import CommentsModel from '../model/comments-model.js';
 import dayjs from 'dayjs';
 import {nanoid} from 'nanoid';
@@ -79,14 +79,6 @@ export default class FilmsPresenter {
     }
   };
 
-  #handleViewAction = (actionType, updateType, update) => {
-    switch (actionType) {
-      case UserAction.UPDATE_FILM:
-        this.#filmsModel.updateFilm(updateType, update);
-        break;
-    }
-  };
-
   #handleModelEvent = (updateType, data) => {
     switch (updateType) {
       case UpdateType.PATCH:
@@ -122,7 +114,7 @@ export default class FilmsPresenter {
   };
 
   #renderFilm = (film) => {
-    const filmPresenter = new FilmPresenter(this.#filmsContainerComponent.element, this.#openFilmPopup, this.#handleViewAction);
+    const filmPresenter = new FilmPresenter(this.#filmsContainerComponent.element, this.#openFilmPopup, this.#filmsModel);
 
     filmPresenter.init(film);
     this.#filmPresenter.set(film.id, filmPresenter);
@@ -256,17 +248,16 @@ export default class FilmsPresenter {
     };
 
     film.comments.push(newComment);
-    this.#commentsModel.addComment(UpdateType.MINOR, newComment, film);
-    this.#filmsModel.updateFilm(UpdateType.MINOR, film);
+    this.#commentsModel.addComment(UpdateType.PATCH, newComment, film);
+    this.#filmsModel.updateFilm(UpdateType.PATCH, film);
     this.#openFilmPopup(film);
   };
 
   #handleCommentDeleteHandler = (film, comments, id) => {
     const index = comments.findIndex((item) => String(item.id) === id);
 
-    this.#commentsModel.deleteComment(UpdateType.MINOR, index);
     film.comments.splice(index, 1);
-    this.#filmsModel.updateFilm(UpdateType.MINOR, film);
+    this.#filmsModel.updateFilm(UpdateType.PATCH, film);
     this.#openFilmPopup(film);
   };
 }
