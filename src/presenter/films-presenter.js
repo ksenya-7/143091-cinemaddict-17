@@ -28,7 +28,6 @@ export default class FilmsPresenter {
   #sortComponent = null;
   #showMoreButtonComponent = null;
 
-  #listFilms = [];
   #renderedFilmCount = FILM_COUNT_PER_STEP;
   #filmPresenter = new Map();
   #film = null;
@@ -82,12 +81,6 @@ export default class FilmsPresenter {
     switch (actionType) {
       case UserAction.UPDATE_FILM:
         this.#filmsModel.updateFilm(updateType, update);
-        break;
-      case UserAction.ADD_FILM:
-        this.#filmsModel.addFilm(updateType, update);
-        break;
-      case UserAction.DELETE_FILM:
-        this.#filmsModel.deleteFilm(updateType, update);
         break;
     }
   };
@@ -209,7 +202,6 @@ export default class FilmsPresenter {
   };
 
   #renderFilmsComponent = () => {
-    // const films = this.films;
     const filmCount = this.films.length;
 
     render(this.#filmsComponent, this.#filmsContainer);
@@ -233,24 +225,21 @@ export default class FilmsPresenter {
   #watchlistPopupClickHandler = () => {
     const film = {...this.#film, watchlist: !this.#film.watchlist};
 
-    this.#listFilms = this.#filmsModel.updateFilm(this.#listFilms, film);
-    this.#filmPresenter.get(film.id).init(film);
+    this.#filmsModel.updateFilm(UpdateType.MINOR, film);
     this.#openFilmPopup(film);
   };
 
   #watchedPopupClickHandler = () => {
     const film = {...this.#film, watched: !this.#film.watched};
 
-    this.#listFilms = this.#filmsModel.updateFilm(this.#listFilms, film);
-    this.#filmPresenter.get(film.id).init(film);
+    this.#filmsModel.updateFilm(UpdateType.MINOR, film);
     this.#openFilmPopup(film);
   };
 
   #favoritePopupClickHandler = () => {
     const film = {...this.#film, favorite: !this.#film.favorite};
 
-    this.#listFilms = this.#filmsModel.updateFilm(this.#listFilms, film);
-    this.#filmPresenter.get(film.id).init(film);
+    this.#filmsModel.updateFilm(UpdateType.MINOR, film);
     this.#openFilmPopup(film);
   };
 
