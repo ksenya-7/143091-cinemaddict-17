@@ -180,7 +180,6 @@ export default class FilmPopupView extends AbstractStatefulView {
 
     this._state = FilmPopupView.parseFilmToState(film);
     this.#setInnerHandlers();
-    this.#setDeleteClickHandler();
   }
 
   get template() {
@@ -212,7 +211,7 @@ export default class FilmPopupView extends AbstractStatefulView {
     document.addEventListener('keydown', this.#formSubmitHandler);
   };
 
-  #setDeleteClickHandler = (callback) => {
+  setDeleteClickHandler = (callback) => {
     this._callback.deleteClick = callback;
 
     const deleteButtons = this.element.querySelectorAll('.film-details__comment-delete');
@@ -244,7 +243,7 @@ export default class FilmPopupView extends AbstractStatefulView {
     this.setWatchedPopupClickHandler(this._callback.watchedPopupClick);
     this.setFavoritePopupClickHandler(this._callback.favoritePopupClick);
     this.setFormSubmitHandler(this._callback.formSubmit);
-    this.#setDeleteClickHandler(this._callback.deleteClick);
+    this.setDeleteClickHandler(this._callback.deleteClick);
   };
 
   #emotionChangeHandler = (evt) => {
@@ -262,29 +261,19 @@ export default class FilmPopupView extends AbstractStatefulView {
 
   #formSubmitHandler = (evt) => {
     if (evt.ctrlKey && evt.key === 'Enter') {
-      this._callback.formSubmit(FilmPopupView.parseStateToFilm(this._state), this._state.comments);
+      this._callback.formSubmit(FilmPopupView.parseStateToFilm(this._state), this._state.commentText, this._state.commentEmotion);
     }
+  };
+
+  #commentDeleteClickHandler = (evt) => {
+    evt.preventDefault();
+    const idDelete = evt.target.dataset.buttonDelete;
+    this._callback.deleteClick(FilmPopupView.parseStateToFilm(this._state), this._state.comments, idDelete);
   };
 
   #setInnerHandlers = () => {
     this.element.querySelector('.film-details__emoji-list').addEventListener('change', this.#emotionChangeHandler);
     this.element.querySelector('.film-details__comment-input').addEventListener('input', this.#commentInputHandler);
-  };
-
-  #commentDeleteClickHandler = (evt) => {
-    evt.preventDefault();
-    const idDelete = Number(evt.target.dataset.buttonDelete);
-
-    const index = this._state.comments.findIndex((item) => item.id === idDelete);
-
-    this._state.comments = [
-      ...this._state.comments.slice(0, index),
-      ...this._state.comments.slice(index + 1),
-    ];
-
-    this.updateElement({
-      ...this._state
-    });
   };
 
   static parseFilmToState = (film) => (
@@ -295,16 +284,8 @@ export default class FilmPopupView extends AbstractStatefulView {
   );
 
   static parseStateToFilm = (state) => {
-    state.comments.push({
-      id: state.comments.length + 1,
-      author: 'John Doe',
-      comment: state.commentText,
-      date: dayjs().format('YYYY/MM/DD HH:MM'),
-      emotion: state.commentEmotion,
-    });
-
-    const film = {...state,
-      comments: state.comments
+    const film = {
+      ...state
     };
 
     delete film.commentText;

@@ -12,13 +12,13 @@ export default class CommentsModel extends Observable {
     this.#comments = value;
   }
 
-  addComment = (updateType, update) => {
+  addComment = (updateType, update, film) => {
     this.#comments = [
       ...this.#comments,
       update,
     ];
 
-    this._notify(updateType, update);
+    this._notify(updateType, film);
   };
 
   deleteComment = (updateType, index) => {

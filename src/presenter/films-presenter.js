@@ -11,6 +11,8 @@ import {sortFilmByDate, sortFilmByRating} from '../utils/film.js';
 import {filter} from '../utils/filter.js';
 import {SortType, UpdateType, UserAction, FilterType} from '../const.js';
 import CommentsModel from '../model/comments-model.js';
+import dayjs from 'dayjs';
+import {nanoid} from 'nanoid';
 
 const FILM_COUNT_PER_STEP = 5;
 
@@ -154,7 +156,8 @@ export default class FilmsPresenter {
     this.#filmPopupComponent.setWatchlistPopupClickHandler(this.#watchlistPopupClickHandler);
     this.#filmPopupComponent.setWatchedPopupClickHandler(this.#watchedPopupClickHandler);
     this.#filmPopupComponent.setFavoritePopupClickHandler(this.#favoritePopupClickHandler);
-    this.#filmPopupComponent.setFormSubmitHandler(this.#handleFormSubmit);
+    this.#filmPopupComponent.setFormSubmitHandler(this.#handleCommentAddHandler);
+    this.#filmPopupComponent.setDeleteClickHandler(this.#handleCommentDeleteHandler);
     render(this.#filmPopupComponent, body);
 
     document.addEventListener('keydown', this.#handleKeyDown);
@@ -243,9 +246,27 @@ export default class FilmsPresenter {
     this.#openFilmPopup(film);
   };
 
-  #handleFormSubmit = (film, newComments) => {
-    this.#commentsModel.comments = newComments;
-    this.#film.comments.push(this.#film.comments.length + 1);
+  #handleCommentAddHandler = (film, text, emotion) => {
+    const newComment = {
+      id: nanoid(),
+      author: 'John Doe',
+      comment: text,
+      date: dayjs().format('YYYY/MM/DD HH:mm'),
+      emotion: emotion,
+    };
+
+    film.comments.push(newComment);
+    this.#commentsModel.addComment(UpdateType.MINOR, newComment, film);
+    this.#filmsModel.updateFilm(UpdateType.MINOR, film);
+    this.#openFilmPopup(film);
+  };
+
+  #handleCommentDeleteHandler = (film, comments, id) => {
+    const index = comments.findIndex((item) => String(item.id) === id);
+
+    this.#commentsModel.deleteComment(UpdateType.MINOR, index);
+    film.comments.splice(index, 1);
+    this.#filmsModel.updateFilm(UpdateType.MINOR, film);
     this.#openFilmPopup(film);
   };
 }
