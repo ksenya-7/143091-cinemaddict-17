@@ -11,8 +11,8 @@ import {sortFilmByDate, sortFilmByRating} from '../utils/film.js';
 import {filter} from '../utils/filter.js';
 import {SortType, UpdateType, FilterType} from '../const.js';
 import CommentsModel from '../model/comments-model.js';
-import dayjs from 'dayjs';
-import {nanoid} from 'nanoid';
+// import dayjs from 'dayjs';
+// import {nanoid} from 'nanoid';
 
 const FILM_COUNT_PER_STEP = 5;
 
@@ -238,17 +238,9 @@ export default class FilmsPresenter {
     this.#openFilmPopup(film);
   };
 
-  #handleCommentAddHandler = (film, text, emotion) => {
-    const newComment = {
-      id: nanoid(),
-      author: 'John Doe',
-      comment: text,
-      date: dayjs().format('YYYY/MM/DD HH:mm'),
-      emotion: emotion,
-    };
-
-    film.comments.push(newComment);
-    this.#commentsModel.addComment(UpdateType.PATCH, newComment, film);
+  #handleCommentAddHandler = (film, comment) => {
+    film.comments.push(comment);
+    this.#commentsModel.addComment(UpdateType.PATCH, comment, film);
     this.#filmsModel.updateFilm(UpdateType.PATCH, film);
     this.#openFilmPopup(film);
   };

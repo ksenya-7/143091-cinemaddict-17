@@ -3,6 +3,7 @@ import {humanizeFilmReleaseDate} from '../utils/film.js';
 import {getTimeFromMins} from '../utils/common.js';
 import {EMOTIONS} from '../const.js';
 import dayjs from 'dayjs';
+import {nanoid} from 'nanoid';
 import he from 'he';
 
 const commentDateDiff = (item) => {
@@ -259,7 +260,9 @@ export default class FilmPopupView extends AbstractStatefulView {
 
   #formSubmitHandler = (evt) => {
     if (evt.ctrlKey && evt.key === 'Enter') {
-      this._callback.formSubmit(FilmPopupView.parseStateToFilm(this._state), this._state.commentText, this._state.commentEmotion);
+      // console.log(this._state.comments);
+      // this.updateElement({commentEmotion: this._state.commentEmotion});
+      this._callback.formSubmit(FilmPopupView.parseStateToFilm(this._state), FilmPopupView.newComment(this._state));
     }
   };
 
@@ -291,4 +294,12 @@ export default class FilmPopupView extends AbstractStatefulView {
 
     return film;
   };
+
+  static newComment = (state) => ({
+    id: nanoid(),
+    author: 'John Doe',
+    comment: state.commentText,
+    date: dayjs().format('YYYY/MM/DD HH:mm'),
+    emotion: state.commentEmotion,
+  });
 }
