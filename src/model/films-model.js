@@ -1,18 +1,13 @@
 import Observable from '../framework/observable.js';
-import {generateFilm} from '../mock/film.js';
 import {UpdateType} from '../const.js';
 
 export default class FilmsModel extends Observable {
   #filmsApiService = null;
-  #films = Array.from({length: 11}, generateFilm);
+  #films = [];
 
   constructor(filmsApiService) {
     super();
     this.#filmsApiService = filmsApiService;
-
-    this.#filmsApiService.films.then((films) => {
-      console.log(films.map(this.#adaptToClient));
-    });
   }
 
   get films() {
@@ -24,6 +19,18 @@ export default class FilmsModel extends Observable {
 
     this._notify(UpdateType.MAJOR, value);
   }
+
+  init = async () => {
+    try {
+      const films = await this.#filmsApiService.films;
+      this.#films = films.map(this.#adaptToClient);
+      // console.log(this.#films);
+    } catch(err) {
+      this.#films = [];
+    }
+
+    this._notify(UpdateType.INIT);
+  };
 
   updateFilm = (updateType, update) => {
     const index = this.#films.findIndex((film) => film.id === update.id);

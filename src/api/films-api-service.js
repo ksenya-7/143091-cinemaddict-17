@@ -20,7 +20,7 @@ export default class FilmsApiService extends ApiService {
     });
 
     const parsedResponse = await ApiService.parseResponse(response);
-    console.log(this.#adaptToServer(movie));
+    // console.log(this.#adaptToServer(movie));
     return parsedResponse;
   };
 

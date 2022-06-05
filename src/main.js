@@ -21,7 +21,10 @@ const filterPresenter = new FilterPresenter(siteMainElement, filterModel, filmsM
 const filmsPresenter = new FilmsPresenter(siteMainElement, filmsModel, filterModel);
 
 render(new ProfileButtonView(), siteHeaderElement);
-render(new StatisticsView(), siteFooterElement);
 
 filterPresenter.init();
 filmsPresenter.init();
+filmsModel.init()
+  .finally(() => {
+    render(new StatisticsView(filmsModel.films), siteFooterElement);
+  });

@@ -66,7 +66,7 @@ const createFilmPopupTemplate = (film) => {
 
   const runtime = getTimeFromMins(filmInfo['runtime']);
 
-  const genre = filmInfo['genre'];
+  const genre = film.genre;
   const genresTemplate = createGenresTemplate(genre);
 
   const comments = film.comments;
