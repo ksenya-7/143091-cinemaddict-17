@@ -252,6 +252,7 @@ export default class FilmsPresenter {
     const index = comments.findIndex((item) => String(item.id) === id);
 
     film.comments.splice(index, 1);
+    // this.#commentsModel.deleteComment(UpdateType.PATCH, index);
     this.#filmsModel.updateFilm(UpdateType.PATCH, film);
     this.#openFilmPopup(film);
   };

@@ -176,7 +176,7 @@ export const generateFilm = () => ({
   amountComments: generateAmountComments(),
   genre: generateGenre(),
   'id': nanoid(),
-  comments: [
+  'comments': [
     1, 2, 3, 4
   ],
   'film_info': generateFilmInfo(),
