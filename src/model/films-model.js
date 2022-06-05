@@ -1,5 +1,6 @@
 import Observable from '../framework/observable.js';
 import {generateFilm} from '../mock/film.js';
+import {UpdateType} from '../const.js';
 
 export default class FilmsModel extends Observable {
   #films = Array.from({length: 11}, generateFilm);
@@ -10,6 +11,8 @@ export default class FilmsModel extends Observable {
 
   set films(value) {
     this.#films = value;
+
+    this._notify(UpdateType.MAJOR, value);
   }
 
   updateFilm = (updateType, update) => {

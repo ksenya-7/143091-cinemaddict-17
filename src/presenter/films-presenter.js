@@ -142,7 +142,9 @@ export default class FilmsPresenter {
     if (this.#filmPopupComponent) {
       this.#closeFilmPopup();
     }
+
     this.#film.comments = this.#film.comments.map((_, id) => this.#commentsModel.comments[id]);
+
     this.#filmPopupComponent = new FilmPopupView(film);
     this.#filmPopupComponent.setCloseClickHandler(this.#closeFilmPopup);
     this.#filmPopupComponent.setWatchlistPopupClickHandler(this.#watchlistPopupClickHandler);
@@ -154,6 +156,7 @@ export default class FilmsPresenter {
 
     document.addEventListener('keydown', this.#handleKeyDown);
     body.classList.add('hide-overflow');
+
     this.#film.comments = this.#film.comments.map((el) => el.id);
   };
 

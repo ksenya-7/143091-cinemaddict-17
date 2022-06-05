@@ -207,7 +207,7 @@ export default class FilmPopupView extends AbstractStatefulView {
 
   setFormSubmitHandler = (callback) => {
     this._callback.formSubmit = callback;
-    document.addEventListener('keydown', this.#formSubmitHandler);
+    this.element.addEventListener('keydown', this.#formSubmitHandler);
   };
 
   setDeleteClickHandler = (callback) => {
@@ -260,8 +260,6 @@ export default class FilmPopupView extends AbstractStatefulView {
 
   #formSubmitHandler = (evt) => {
     if (evt.ctrlKey && evt.key === 'Enter') {
-      // console.log(this._state.comments);
-      // this.updateElement({commentEmotion: this._state.commentEmotion});
       this._callback.formSubmit(FilmPopupView.parseStateToFilm(this._state), FilmPopupView.newComment(this._state));
     }
   };
