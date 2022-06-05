@@ -20,7 +20,7 @@ export default class FilmsApiService extends ApiService {
     });
 
     const parsedResponse = await ApiService.parseResponse(response);
-    // console.log(this.#adaptToServer(movie));
+
     return parsedResponse;
   };
 
@@ -36,7 +36,6 @@ export default class FilmsApiService extends ApiService {
       }
     };
 
-    // Ненужные ключи мы удаляем
     delete adaptedFilm.amountComments;
     delete adaptedFilm.genre;
     delete adaptedFilm.watchlist;

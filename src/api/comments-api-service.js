@@ -5,11 +5,18 @@ const Method = {
   PUT: 'PUT',
 };
 
-export default class CommentApiService extends ApiService {
-  comment = (id) => this._load({url: `comments/${id}`}).then(ApiService.parseResponse);
-  // get comment() {
-  //   return this._load({url: 'comments/??'}).then(ApiService.parseResponse);
-  // }
+export default class CommentsApiService extends ApiService {
+  idfilm = null;
+
+  constructor(endPoint, authorization, idfilm) {
+    super(endPoint, authorization);
+    this.idfilm = idfilm;
+  }
+
+  get comments() {
+    return this._load({url: `comments/${this.idfilm}`})
+      .then(ApiService.parseResponse);
+  }
 
   updateComment = async (comment) => {
     const response = await this._load({
