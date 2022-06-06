@@ -3,18 +3,18 @@ import {humanizeFilmReleaseDate} from '../utils/film.js';
 import {getTimeFromMins} from '../utils/common.js';
 import {EMOTIONS} from '../const.js';
 import dayjs from 'dayjs';
+import {nanoid} from 'nanoid';
+import he from 'he';
 
 const commentDateDiff = (item) => {
   const diff = dayjs().diff(item, 'day');
 
-  if (item.includes('day')) {
+  if (item.includes('day') || diff > 31) {
     return item;
   } else if (diff === 0) {
     return 'Today';
   } else if (diff === 1) {
     return 'A day ago';
-  } else if (diff > 31) {
-    return item;
   } else {
     return `A ${diff} days ago`;
   }
@@ -43,7 +43,9 @@ const createCommentsTemplate = (comments) => comments.map((comment) => {
         <p class="film-details__comment-info">
           <span class="film-details__comment-author">${comment.author}</span>
           <span class="film-details__comment-day">${commentDate}</span>
-          <button class="film-details__comment-delete">Delete</button>
+
+          <button class="film-details__comment-delete" data-button-delete="${comment.id}">Delete</button>
+
         </p>
       </div>
     </li>`);
@@ -133,7 +135,7 @@ const createFilmPopupTemplate = (film) => {
               </table>
 
               <p class="film-details__film-description">
-                ${filmInfo['description']}
+                ${he.encode(filmInfo['description'])}
               </p>
             </div>
           </div>
@@ -205,7 +207,16 @@ export default class FilmPopupView extends AbstractStatefulView {
 
   setFormSubmitHandler = (callback) => {
     this._callback.formSubmit = callback;
-    document.addEventListener('keydown', this.#formSubmitHandler);
+    this.element.addEventListener('keydown', this.#formSubmitHandler);
+  };
+
+  setDeleteClickHandler = (callback) => {
+    this._callback.deleteClick = callback;
+
+    const deleteButtons = this.element.querySelectorAll('.film-details__comment-delete');
+    deleteButtons.forEach((button) => {
+      button.addEventListener('click', this.#commentDeleteClickHandler);
+    });
   };
 
   #closeClickHandler = () => {
@@ -231,6 +242,7 @@ export default class FilmPopupView extends AbstractStatefulView {
     this.setWatchedPopupClickHandler(this._callback.watchedPopupClick);
     this.setFavoritePopupClickHandler(this._callback.favoritePopupClick);
     this.setFormSubmitHandler(this._callback.formSubmit);
+    this.setDeleteClickHandler(this._callback.deleteClick);
   };
 
   #emotionChangeHandler = (evt) => {
@@ -248,8 +260,14 @@ export default class FilmPopupView extends AbstractStatefulView {
 
   #formSubmitHandler = (evt) => {
     if (evt.ctrlKey && evt.key === 'Enter') {
-      this._callback.formSubmit(FilmPopupView.parseStateToFilm(this._state), this._state.comments);
+      this._callback.formSubmit(FilmPopupView.parseStateToFilm(this._state), FilmPopupView.newComment(this._state));
     }
+  };
+
+  #commentDeleteClickHandler = (evt) => {
+    evt.preventDefault();
+    const idDelete = evt.target.dataset.buttonDelete;
+    this._callback.deleteClick(FilmPopupView.parseStateToFilm(this._state), this._state.comments, idDelete);
   };
 
   #setInnerHandlers = () => {
@@ -265,16 +283,8 @@ export default class FilmPopupView extends AbstractStatefulView {
   );
 
   static parseStateToFilm = (state) => {
-    state.comments.push({
-      id: state.comments.length + 1,
-      author: 'John Doe',
-      comment: state.commentText,
-      date: dayjs().format('YYYY/MM/DD HH:MM'),
-      emotion: state.commentEmotion,
-    });
-
-    const film = {...state,
-      comments: state.comments
+    const film = {
+      ...state
     };
 
     delete film.commentText;
@@ -282,4 +292,12 @@ export default class FilmPopupView extends AbstractStatefulView {
 
     return film;
   };
+
+  static newComment = (state) => ({
+    id: nanoid(),
+    author: 'John Doe',
+    comment: state.commentText,
+    date: dayjs().format('YYYY/MM/DD HH:mm'),
+    emotion: state.commentEmotion,
+  });
 }
