@@ -31,7 +31,7 @@ export default class FilmsModel extends Observable {
     this._notify(UpdateType.INIT);
   };
 
-  updateFilm = async(updateType, update) => {
+  updateFilm = async (updateType, update) => {
     const index = this.#films.findIndex((film) => film.id === update.id);
 
     if (index === -1) {
@@ -54,7 +54,6 @@ export default class FilmsModel extends Observable {
 
   #adaptToClient = (film) => {
     const adaptedFilm = {...film,
-      amountComments: film['comments'].length,
       genre: film['film_info']['genre'],
       watchlist: film['user_details']['watchlist'],
       watched: film['user_details']['already_watched'],

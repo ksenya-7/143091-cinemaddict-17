@@ -148,7 +148,7 @@ export default class FilmsPresenter {
     render(this.#showMoreButtonComponent, this.#filmsListComponent.element);
   };
 
-  #openFilmPopup = (film) => {
+  #openFilmPopup = (film, scrollTop) => {
     this.#film = film;
     const commentsModel = new CommentsModel(new CommentsApiService(END_POINT, AUTHORIZATION, this.#film.id));
 
@@ -159,6 +159,7 @@ export default class FilmsPresenter {
         }
 
         this.#film.comments = commentsModel.comments;
+        // console.log(this.#film.comments);
         this.#filmPopupComponent = new FilmPopupView(this.#film);
         this.#filmPopupComponent.setCloseClickHandler(this.#closeFilmPopup);
         this.#filmPopupComponent.setWatchlistPopupClickHandler(this.#watchlistPopupClickHandler);
@@ -172,6 +173,10 @@ export default class FilmsPresenter {
         body.classList.add('hide-overflow');
 
         this.#film.comments = this.#film.comments.map((el) => el.id);
+        if (scrollTop) {
+          this.#filmPopupComponent.element.scrollTop = scrollTop;
+        }
+        // console.log(this.#filmPopupComponent.element.scrollTop);
       });
   };
 
@@ -262,21 +267,21 @@ export default class FilmsPresenter {
     this.#openFilmPopup(film);
   };
 
-  #handleCommentAddHandler = (film, comment) => {
+  #handleCommentAddHandler = (film, comment, scrollTop) => {
     const commentsModel = new CommentsModel(new CommentsApiService(END_POINT, AUTHORIZATION, this.#film.id));
-    film.comments.push(comment);
-    commentsModel.addComment(UpdateType.PATCH, comment, film);
-    this.#filmsModel.updateFilm(UpdateType.PATCH, film);
-    this.#openFilmPopup(film);
+    commentsModel.addComment(UpdateType.MINOR, comment);
+    this.#filmsModel.updateFilm(UpdateType.MINOR, film); // вызывает ошибку
+    this.#openFilmPopup(film, scrollTop);
   };
 
   #handleCommentDeleteHandler = (film, comments, id) => {
     const commentsModel = new CommentsModel(new CommentsApiService(END_POINT, AUTHORIZATION, this.#film.id));
-    const index = comments.findIndex((item) => String(item.id) === id);
-
-    film.comments.splice(index, 1);
-    commentsModel.deleteComment(UpdateType.PATCH, index);
-    this.#filmsModel.updateFilm(UpdateType.PATCH, film);
-    this.#openFilmPopup(film);
+    commentsModel.init()
+      .finally(() => {
+        const comment = comments.find((item) => String(item.id) === id);
+        commentsModel.deleteComment(UpdateType.MINOR, comment); // удаляет при повторном клике только
+        this.#filmsModel.updateFilm(UpdateType.MINOR, film); // вызывает ошибку
+        this.#openFilmPopup(film);
+      });
   };
 }

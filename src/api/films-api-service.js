@@ -11,16 +11,17 @@ export default class FilmsApiService extends ApiService {
       .then(ApiService.parseResponse);
   }
 
-  updateFilm = async (movie) => {
+  updateFilm = async (film) => {
     const response = await this._load({
-      url: `movies/${movie.id}`,
+      url: `movies/${film.id}`,
       method: Method.PUT,
-      body: JSON.stringify(this.#adaptToServer(movie)),
+      body: JSON.stringify(this.#adaptToServer(film)),
       headers: new Headers({'Content-Type': 'application/json'}),
     });
 
     const parsedResponse = await ApiService.parseResponse(response);
 
+    // console.log(this.#adaptToServer(film));
     return parsedResponse;
   };
 
@@ -31,12 +32,11 @@ export default class FilmsApiService extends ApiService {
       },
       'user_details': {...film['user_details'],
         'watchlist': film.watchlist,
-        'watched': film.watched,
+        'already_watched': film.watched,
         'favorite': film.favorite,
       }
     };
 
-    delete adaptedFilm.amountComments;
     delete adaptedFilm.genre;
     delete adaptedFilm.watchlist;
     delete adaptedFilm.watched;

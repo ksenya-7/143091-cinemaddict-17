@@ -6,7 +6,7 @@ const createLoadingTemplate = () => (
   </h2>`
 );
 
-export default class ProfileButtonView extends AbstractView {
+export default class LoadingView extends AbstractView {
   get template() {
     return createLoadingTemplate();
   }

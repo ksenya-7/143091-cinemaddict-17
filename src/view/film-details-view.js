@@ -2,7 +2,6 @@ import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import {getTimeFromMins, humanizeFilmReleaseDate} from '../utils/film.js';
 import {EMOTIONS} from '../const.js';
 import dayjs from 'dayjs';
-import {nanoid} from 'nanoid';
 import he from 'he';
 
 const commentDateDiff = (item) => {
@@ -206,7 +205,7 @@ export default class FilmPopupView extends AbstractStatefulView {
 
   setFormSubmitHandler = (callback) => {
     this._callback.formSubmit = callback;
-    this.element.addEventListener('keydown', this.#formSubmitHandler);
+    this.element.addEventListener('keydown', this.#commentAddSubmitHandler);
   };
 
   setDeleteClickHandler = (callback) => {
@@ -247,19 +246,24 @@ export default class FilmPopupView extends AbstractStatefulView {
   #emotionChangeHandler = (evt) => {
     this.updateElement({
       commentEmotion: evt.target.value,
+      scrollTop: this.element.scrollTop,
     });
+    // console.log(this.element.scrollTop);
   };
 
   #commentInputHandler = (evt) => {
     evt.preventDefault();
     this._setState({
       commentText: evt.target.value,
+      scrollTop: this.element.scrollTop,
     });
+    // console.log(this.element.scrollTop);
   };
 
-  #formSubmitHandler = (evt) => {
+  #commentAddSubmitHandler = (evt) => {
     if (evt.ctrlKey && evt.key === 'Enter') {
-      this._callback.formSubmit(FilmPopupView.parseStateToFilm(this._state), FilmPopupView.newComment(this._state));
+      this._callback.formSubmit(FilmPopupView.parseStateToFilm(this._state), FilmPopupView.newComment(this._state), this._state.scrollTop);
+      // console.log(this._state.scrollTop);
     }
   };
 
@@ -267,6 +271,7 @@ export default class FilmPopupView extends AbstractStatefulView {
     evt.preventDefault();
     const idDelete = evt.target.dataset.buttonDelete;
     this._callback.deleteClick(FilmPopupView.parseStateToFilm(this._state), this._state.comments, idDelete);
+    // FilmPopupView.scrollTop = this._state.scrollTop;
   };
 
   #setInnerHandlers = () => {
@@ -278,6 +283,7 @@ export default class FilmPopupView extends AbstractStatefulView {
     {...film,
       commentText: '',
       commentEmotion: '',
+      scrollTop: '',
     }
   );
 
@@ -288,15 +294,13 @@ export default class FilmPopupView extends AbstractStatefulView {
 
     delete film.commentText;
     delete film.commentEmotion;
+    delete film.scrollTop;
 
     return film;
   };
 
   static newComment = (state) => ({
-    id: nanoid(),
-    author: 'John Doe',
     comment: state.commentText,
-    date: dayjs().format('YYYY/MM/DD HH:mm'),
     emotion: state.commentEmotion,
   });
 }
