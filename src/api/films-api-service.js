@@ -40,6 +40,7 @@ export default class FilmsApiService extends ApiService {
     delete adaptedFilm.watchlist;
     delete adaptedFilm.watched;
     delete adaptedFilm.favorite;
+
     return adaptedFilm;
   };
 }

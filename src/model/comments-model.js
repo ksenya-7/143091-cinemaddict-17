@@ -1,7 +1,9 @@
 import Observable from '../framework/observable.js';
+
 export default class CommentsModel extends Observable {
   #commentsApiService = null;
   #comments = [];
+
   constructor(commentsApiService) {
     super();
     this.#commentsApiService = commentsApiService;
@@ -42,6 +44,7 @@ export default class CommentsModel extends Observable {
         ...this.#comments.slice(0, index),
         ...this.#comments.slice(index + 1),
       ];
+
       this._notify(updateType);
     } catch(err) {
       throw new Error('Can\'t delete comment');

@@ -4,6 +4,7 @@ import {UpdateType} from '../const.js';
 export default class FilmsModel extends Observable {
   #filmsApiService = null;
   #films = [];
+
   constructor(filmsApiService) {
     super();
     this.#filmsApiService = filmsApiService;
@@ -15,6 +16,7 @@ export default class FilmsModel extends Observable {
 
   set films(value) {
     this.#films = value;
+
     this._notify(UpdateType.MAJOR, value);
   }
 

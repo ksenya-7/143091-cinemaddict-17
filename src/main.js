@@ -17,8 +17,8 @@ const siteFooterElement = siteBodyElement.querySelector('.footer__statistics');
 
 const filmsModel = new FilmsModel(new FilmsApiService(END_POINT, AUTHORIZATION));
 const filterModel = new FilterModel();
-
 const filterPresenter = new FilterPresenter(siteMainElement, filterModel, filmsModel);
+
 const filmsPresenter = new FilmsPresenter(siteMainElement, filmsModel, filterModel);
 
 filmsPresenter.init();

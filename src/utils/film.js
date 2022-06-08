@@ -1,9 +1,9 @@
 import dayjs from 'dayjs';
 
+const getTimeFromMins = (mins) => (Math.trunc(mins/60) === 0) ? `${mins % 60}m` : `${Math.trunc(mins/60)}h ${mins % 60}m`;
+
 const humanizeFilmReleaseDate = (releaseDate) => dayjs(releaseDate).format('D MMMM YYYY');
 const humanizeFilmReleaseYear = (releaseDate) => dayjs(releaseDate).format('YYYY');
-
-const getTimeFromMins = (mins) => (Math.trunc(mins/60) === 0) ? `${mins % 60}m` : `${Math.trunc(mins/60)}h ${mins % 60}m`;
 
 const getWeightForNullDate = (dateA, dateB) => {
   if (dateA === null && dateB === null) {
