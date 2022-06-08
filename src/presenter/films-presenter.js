@@ -4,6 +4,7 @@ import FilmsListView from '../view/films-list-view.js';
 import FilmsContainerView from '../view/films-container-view.js';
 import ShowMoreButtonView from '../view/show-more-button-view.js';
 import FilmsEmptyView from '../view/films-empty-view.js';
+import LoadingView from '../view/loading-view.js';
 import FilmPopupView from '../view/film-details-view.js';
 import SortView from '../view/sort-view.js';
 import FilmPresenter from './film-presenter.js';
@@ -11,9 +12,10 @@ import {sortFilmByDate, sortFilmByRating} from '../utils/film.js';
 import {filter} from '../utils/filter.js';
 import {SortType, UpdateType, FilterType} from '../const.js';
 import CommentsModel from '../model/comments-model.js';
-// import dayjs from 'dayjs';
-// import {nanoid} from 'nanoid';
+import CommentsApiService from '../api/comments-api-service.js';
 
+const AUTHORIZATION = 'Basic ikf1Leyz2gj3gjkire4';
+const END_POINT = 'https://17.ecmascript.pages.academy/cinemaddict';
 const FILM_COUNT_PER_STEP = 5;
 
 const body = document.querySelector('body');
@@ -26,6 +28,7 @@ export default class FilmsPresenter {
   #filmsComponent = new FilmsView();
   #filmsListComponent = new FilmsListView();
   #filmsContainerComponent = new FilmsContainerView();
+  #loadingComponent = new LoadingView();
   #noFilmComponent = null;
   #sortComponent = null;
   #showMoreButtonComponent = null;
@@ -35,8 +38,8 @@ export default class FilmsPresenter {
   #film = null;
 
   #currentSortType = SortType.DEFAULT;
-  #commentsModel = new CommentsModel();
   #filterType = FilterType.ALL;
+  #isLoading = true;
 
   constructor(filmsContainer, filmsModel, filterModel) {
     this.#filmsContainer = filmsContainer;
@@ -63,7 +66,7 @@ export default class FilmsPresenter {
   }
 
   init = () => {
-    this.#renderFilmsComponent();
+    this.#renderBoard();
   };
 
   #handleShowMoreButtonClick = () => {
@@ -86,11 +89,16 @@ export default class FilmsPresenter {
         break;
       case UpdateType.MINOR:
         this.#clearBoard();
-        this.#renderFilmsComponent();
+        this.#renderBoard();
         break;
       case UpdateType.MAJOR:
         this.#clearBoard({resetRenderedFilmCount: true, resetSortType: true});
-        this.#renderFilmsComponent();
+        this.#renderBoard();
+        break;
+      case UpdateType.INIT:
+        this.#isLoading = false;
+        remove(this.#loadingComponent);
+        this.#renderBoard();
         break;
     }
   };
@@ -103,7 +111,7 @@ export default class FilmsPresenter {
     this.#currentSortType = sortType;
 
     this.#clearBoard({resetRenderedFilmCount: true});
-    this.#renderFilmsComponent();
+    this.#renderBoard();
   };
 
   #renderSort = () => {
@@ -124,6 +132,10 @@ export default class FilmsPresenter {
     films.forEach((film) => this.#renderFilm(film));
   };
 
+  #renderLoading = () => {
+    render(this.#loadingComponent, this.#filmsComponent.element, RenderPosition.AFTERBEGIN);
+  };
+
   #renderNoFilms = () => {
     this.#noFilmComponent = new FilmsEmptyView(this.#filterType);
     render(this.#noFilmComponent, this.#filmsComponent.element, RenderPosition.AFTERBEGIN);
@@ -138,26 +150,29 @@ export default class FilmsPresenter {
 
   #openFilmPopup = (film) => {
     this.#film = film;
+    const commentsModel = new CommentsModel(new CommentsApiService(END_POINT, AUTHORIZATION, this.#film.id));
 
-    if (this.#filmPopupComponent) {
-      this.#closeFilmPopup();
-    }
+    commentsModel.init()
+      .finally(() => {
+        if (this.#filmPopupComponent) {
+          this.#closeFilmPopup();
+        }
 
-    this.#film.comments = this.#film.comments.map((_, id) => this.#commentsModel.comments[id]);
+        this.#film.comments = commentsModel.comments;
+        this.#filmPopupComponent = new FilmPopupView(this.#film);
+        this.#filmPopupComponent.setCloseClickHandler(this.#closeFilmPopup);
+        this.#filmPopupComponent.setWatchlistPopupClickHandler(this.#watchlistPopupClickHandler);
+        this.#filmPopupComponent.setWatchedPopupClickHandler(this.#watchedPopupClickHandler);
+        this.#filmPopupComponent.setFavoritePopupClickHandler(this.#favoritePopupClickHandler);
+        this.#filmPopupComponent.setFormSubmitHandler(this.#handleCommentAddHandler);
+        this.#filmPopupComponent.setDeleteClickHandler(this.#handleCommentDeleteHandler);
+        render(this.#filmPopupComponent, body);
 
-    this.#filmPopupComponent = new FilmPopupView(film);
-    this.#filmPopupComponent.setCloseClickHandler(this.#closeFilmPopup);
-    this.#filmPopupComponent.setWatchlistPopupClickHandler(this.#watchlistPopupClickHandler);
-    this.#filmPopupComponent.setWatchedPopupClickHandler(this.#watchedPopupClickHandler);
-    this.#filmPopupComponent.setFavoritePopupClickHandler(this.#favoritePopupClickHandler);
-    this.#filmPopupComponent.setFormSubmitHandler(this.#handleCommentAddHandler);
-    this.#filmPopupComponent.setDeleteClickHandler(this.#handleCommentDeleteHandler);
-    render(this.#filmPopupComponent, body);
+        document.addEventListener('keydown', this.#handleKeyDown);
+        body.classList.add('hide-overflow');
 
-    document.addEventListener('keydown', this.#handleKeyDown);
-    body.classList.add('hide-overflow');
-
-    this.#film.comments = this.#film.comments.map((el) => el.id);
+        this.#film.comments = this.#film.comments.map((el) => el.id);
+      });
   };
 
   #closeFilmPopup = () => {
@@ -181,6 +196,7 @@ export default class FilmsPresenter {
     this.#filmPresenter.clear();
 
     remove(this.#sortComponent);
+    remove(this.#loadingComponent);
     remove(this.#noFilmComponent);
     remove(this.#showMoreButtonComponent);
 
@@ -199,10 +215,15 @@ export default class FilmsPresenter {
     }
   };
 
-  #renderFilmsComponent = () => {
+  #renderBoard = () => {
     const filmCount = this.films.length;
 
     render(this.#filmsComponent, this.#filmsContainer);
+
+    if (this.#isLoading) {
+      this.#renderLoading();
+      return;
+    }
 
     if (filmCount === 0) {
       this.#renderNoFilms();
@@ -242,16 +263,19 @@ export default class FilmsPresenter {
   };
 
   #handleCommentAddHandler = (film, comment) => {
+    const commentsModel = new CommentsModel(new CommentsApiService(END_POINT, AUTHORIZATION, this.#film.id));
     film.comments.push(comment);
-    this.#commentsModel.addComment(UpdateType.PATCH, comment, film);
+    commentsModel.addComment(UpdateType.PATCH, comment, film);
     this.#filmsModel.updateFilm(UpdateType.PATCH, film);
     this.#openFilmPopup(film);
   };
 
   #handleCommentDeleteHandler = (film, comments, id) => {
+    const commentsModel = new CommentsModel(new CommentsApiService(END_POINT, AUTHORIZATION, this.#film.id));
     const index = comments.findIndex((item) => String(item.id) === id);
 
     film.comments.splice(index, 1);
+    commentsModel.deleteComment(UpdateType.PATCH, index);
     this.#filmsModel.updateFilm(UpdateType.PATCH, film);
     this.#openFilmPopup(film);
   };

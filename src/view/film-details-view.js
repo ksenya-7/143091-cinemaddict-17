@@ -1,6 +1,5 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
-import {humanizeFilmReleaseDate} from '../utils/film.js';
-import {getTimeFromMins} from '../utils/common.js';
+import {getTimeFromMins, humanizeFilmReleaseDate} from '../utils/film.js';
 import {EMOTIONS} from '../const.js';
 import dayjs from 'dayjs';
 import {nanoid} from 'nanoid';
@@ -66,7 +65,7 @@ const createFilmPopupTemplate = (film) => {
 
   const runtime = getTimeFromMins(filmInfo['runtime']);
 
-  const genre = filmInfo['genre'];
+  const genre = film.genre;
   const genresTemplate = createGenresTemplate(genre);
 
   const comments = film.comments;

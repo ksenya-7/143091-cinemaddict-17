@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 
+const getTimeFromMins = (mins) => (Math.trunc(mins/60) === 0) ? `${mins % 60}m` : `${Math.trunc(mins/60)}h ${mins % 60}m`;
 const humanizeFilmReleaseDate = (releaseDate) => dayjs(releaseDate).format('D MMMM YYYY');
 const humanizeFilmReleaseYear = (releaseDate) => dayjs(releaseDate).format('YYYY');
 
@@ -47,4 +48,4 @@ const sortFilmByRating = (filmA, filmB) => {
   return weight ?? filmB['film_info']['total_rating'] - filmA['film_info']['total_rating'];
 };
 
-export {humanizeFilmReleaseDate, humanizeFilmReleaseYear, sortFilmByDate, sortFilmByRating};
+export {getTimeFromMins, humanizeFilmReleaseDate, humanizeFilmReleaseYear, sortFilmByDate, sortFilmByRating};
