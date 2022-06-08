@@ -1,4 +1,5 @@
 import {render, remove, RenderPosition} from '../framework/render.js';
+import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 import FilmsView from '../view/films-view.js';
 import FilmsListView from '../view/films-list-view.js';
 import FilmsContainerView from '../view/films-container-view.js';
@@ -17,6 +18,16 @@ import CommentsApiService from '../api/comments-api-service.js';
 const AUTHORIZATION = 'Basic ikf1Leyz2gj3gjkire4';
 const END_POINT = 'https://17.ecmascript.pages.academy/cinemaddict';
 const FILM_COUNT_PER_STEP = 5;
+
+const TimeLimit = {
+  LOWER_LIMIT: 350,
+  UPPER_LIMIT: 1000,
+};
+
+const Mode = {
+  DEFAULT: 'DEFAULT',
+  EDITING: 'EDITING',
+};
 
 const body = document.querySelector('body');
 export default class FilmsPresenter {
@@ -40,6 +51,8 @@ export default class FilmsPresenter {
   #currentSortType = SortType.DEFAULT;
   #filterType = FilterType.ALL;
   #isLoading = true;
+  #mode = Mode.DEFAULT;
+  #uiBlocker = new UiBlocker(TimeLimit.LOWER_LIMIT, TimeLimit.UPPER_LIMIT);
 
   constructor(filmsContainer, filmsModel, filterModel) {
     this.#filmsContainer = filmsContainer;
@@ -67,6 +80,31 @@ export default class FilmsPresenter {
 
   init = () => {
     this.#renderBoard();
+  };
+
+  setDeleting = () => {
+    if (this.#mode === Mode.EDITING) {
+      this.#filmPopupComponent.updateElement({
+        isDisabled: true,
+        isDeleting: true,
+      });
+    }
+  };
+
+  setAborting = () => {
+    if (this.#mode === Mode.DEFAULT) {
+      this.#filmPopupComponent.shake();
+      return;
+    }
+
+    const resetFormState = () => {
+      this.#filmPopupComponent.updateElement({
+        isDisabled: false,
+        isDeleting: false,
+      });
+    };
+
+    this.#filmPopupComponent.shake(resetFormState);
   };
 
   #handleShowMoreButtonClick = () => {
@@ -246,25 +284,55 @@ export default class FilmsPresenter {
     }
   };
 
-  #watchlistPopupClickHandler = () => {
+  #watchlistPopupClickHandler = async () => {
+    this.#uiBlocker.block();
+
     const film = {...this.#film, watchlist: !this.#film.watchlist};
 
-    this.#filmsModel.updateFilm(UpdateType.MINOR, film);
+    // this.#filmsModel.updateFilm(UpdateType.MINOR, film);
+    try {
+      await this.#filmsModel.updateFilm(UpdateType.MINOR, film);
+    } catch(err) {
+      this.#filmPresenter.get(film.id).setAborting();
+    }
+
     this.#openFilmPopup(film);
+
+    this.#uiBlocker.unblock();
   };
 
-  #watchedPopupClickHandler = () => {
+  #watchedPopupClickHandler = async () => {
+    this.#uiBlocker.block();
+
     const film = {...this.#film, watched: !this.#film.watched};
 
-    this.#filmsModel.updateFilm(UpdateType.MINOR, film);
+    // this.#filmsModel.updateFilm(UpdateType.MINOR, film);
+    try {
+      await this.#filmsModel.updateFilm(UpdateType.MINOR, film);
+    } catch(err) {
+      this.#filmPresenter.get(film.id).setAborting();
+    }
+
     this.#openFilmPopup(film);
+
+    this.#uiBlocker.unblock();
   };
 
-  #favoritePopupClickHandler = () => {
+  #favoritePopupClickHandler = async () => {
+    this.#uiBlocker.block();
+
     const film = {...this.#film, favorite: !this.#film.favorite};
 
-    this.#filmsModel.updateFilm(UpdateType.MINOR, film);
+    // this.#filmsModel.updateFilm(UpdateType.MINOR, film);
+    try {
+      await this.#filmsModel.updateFilm(UpdateType.MINOR, film);
+    } catch(err) {
+      this.#filmPresenter.get(film.id).setAborting();
+    }
+
     this.#openFilmPopup(film);
+
+    this.#uiBlocker.unblock();
   };
 
   #handleCommentAddHandler = (film, comment, scrollTop) => {
@@ -281,6 +349,7 @@ export default class FilmsPresenter {
         const comment = comments.find((item) => String(item.id) === id);
         commentsModel.deleteComment(UpdateType.MINOR, comment); // удаляет при повторном клике только
         this.#filmsModel.updateFilm(UpdateType.MINOR, film); // вызывает ошибку
+        // this.#filmPresenter.get(comment.id).setDeleting(); //как это работает вообще
         this.#openFilmPopup(film);
       });
   };

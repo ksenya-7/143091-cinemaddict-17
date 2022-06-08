@@ -30,7 +30,7 @@ const createGenresTemplate = (genres) => {
   );
 };
 
-const createCommentsTemplate = (comments) => comments.map((comment) => {
+const createCommentsTemplate = (comments, isDisabled, isDeleting) => comments.map((comment) => {
   const commentDate = commentDateDiff(comment.date);
 
   return (
@@ -43,22 +43,22 @@ const createCommentsTemplate = (comments) => comments.map((comment) => {
         <p class="film-details__comment-info">
           <span class="film-details__comment-author">${comment.author}</span>
           <span class="film-details__comment-day">${commentDate}</span>
-
-          <button class="film-details__comment-delete" data-button-delete="${comment.id}">Delete</button>
-
+          <button class="film-details__comment-delete" data-button-delete="${comment.id}" ${isDisabled ? 'disabled' : ''}>${isDeleting ? 'Deleting...' : 'Delete'}</button>
         </p>
       </div>
     </li>`);
 }).join('');
 
-const createEmotionsTemplate = () => EMOTIONS.map((el) => (
-  `<input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${el}" value="${el}">
+const createEmotionsTemplate = (isDisabled) => EMOTIONS.map((el) => (
+  `<input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${el}" value="${el}" ${isDisabled ? 'disabled' : ''}>
     <label class="film-details__emoji-label" for="emoji-${el}">
       <img src="./images/emoji/${el}.png" width="30" height="30" alt="emoji-${el}">
     </label>`)).join('');
 
 
 const createFilmPopupTemplate = (film) => {
+  const {isDisabled, isDeleting} = film;
+
   const filmInfo = film['film_info'];
 
   const releaseDate = filmInfo['release']['date'];
@@ -69,13 +69,13 @@ const createFilmPopupTemplate = (film) => {
   const genresTemplate = createGenresTemplate(film.genre);
 
   const comments = film.comments;
-  const commentsTemplate = createCommentsTemplate(film.comments);
+  const commentsTemplate = createCommentsTemplate(film.comments, isDisabled, isDeleting);
 
   const watchlistClassName = film.watchlist ? 'film-details__control-button--active' : '';
   const watchedClassName = film.watched ? 'film-details__control-button--active' : '';
   const favoriteClassName = film.favorite ? 'film-details__control-button--active' : '';
 
-  const emotionsTemplate = createEmotionsTemplate();
+  const emotionsTemplate = createEmotionsTemplate(isDisabled);
 
   return (
     `<section class="film-details">
@@ -134,15 +134,15 @@ const createFilmPopupTemplate = (film) => {
               </table>
 
               <p class="film-details__film-description">
-                ${he.encode(filmInfo['description'])}
+                ${filmInfo['description']}
               </p>
             </div>
           </div>
 
           <section class="film-details__controls">
-            <button type="button" class="film-details__control-button ${watchlistClassName} film-details__control-button--watchlist" id="watchlist" name="watchlist">Add to watchlist</button>
-            <button type="button" class="film-details__control-button ${watchedClassName} film-details__control-button--watched" id="watched" name="watched">Already watched</button>
-            <button type="button" class="film-details__control-button ${favoriteClassName} film-details__control-button--favorite" id="favorite" name="favorite">Add to favorites</button>
+            <button type="button" class="film-details__control-button ${watchlistClassName} film-details__control-button--watchlist" id="watchlist" name="watchlist" ${isDisabled ? 'disabled' : ''}>Add to watchlist</button>
+            <button type="button" class="film-details__control-button ${watchedClassName} film-details__control-button--watched" id="watched" name="watched" ${isDisabled ? 'disabled' : ''}>Already watched</button>
+            <button type="button" class="film-details__control-button ${favoriteClassName} film-details__control-button--favorite" id="favorite" name="favorite" ${isDisabled ? 'disabled' : ''}>Add to favorites</button>
           </section>
         </div>
 
@@ -158,7 +158,7 @@ const createFilmPopupTemplate = (film) => {
               </div>
 
               <label class="film-details__comment-label">
-                <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${film.commentText ? `${film.commentText}` : ''}</textarea>
+                <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment" ${isDisabled ? 'disabled' : ''}>${film.commentText ? `${he.encode(film.commentText)}` : ''}</textarea>
               </label>
 
               <div class="film-details__emoji-list">
@@ -286,7 +286,6 @@ export default class FilmPopupView extends AbstractStatefulView {
       commentEmotion: '',
       scrollTop: '',
       isDisabled: false,
-      isSaving: false,
       isDeleting: false,
     }
 
@@ -301,7 +300,6 @@ export default class FilmPopupView extends AbstractStatefulView {
     delete film.commentEmotion;
     delete film.scrollTop;
     delete film.isDisabled;
-    delete film.isSaving;
     delete film.isDeleting;
 
     return film;
