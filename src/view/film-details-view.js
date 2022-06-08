@@ -285,7 +285,11 @@ export default class FilmPopupView extends AbstractStatefulView {
       commentText: '',
       commentEmotion: '',
       scrollTop: '',
+      isDisabled: false,
+      isSaving: false,
+      isDeleting: false,
     }
+
   );
 
   static parseStateToFilm = (state) => {
@@ -296,6 +300,9 @@ export default class FilmPopupView extends AbstractStatefulView {
     delete film.commentText;
     delete film.commentEmotion;
     delete film.scrollTop;
+    delete film.isDisabled;
+    delete film.isSaving;
+    delete film.isDeleting;
 
     return film;
   };
