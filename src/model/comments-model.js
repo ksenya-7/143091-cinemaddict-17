@@ -9,29 +9,26 @@ export default class CommentsModel extends Observable {
     this.#commentsApiService = commentsApiService;
   }
 
-  get comments() {
-    return this.#comments;
-  }
-
-  init = async () => {
+  getComments = async (filmId) => {
     try {
-      this.#comments = await this.#commentsApiService.comments;
+      this.#comments = await this.#commentsApiService.getComments(filmId);
+      return this.#comments;
     } catch(err) {
-      this.#comments = [];
+      throw new Error('Can\'t get comments');
     }
   };
 
-  addComment = async (updateType, update) => {
+  addComment = async (updateType, update, film) => {
     try {
-      const newComment = await this.#commentsApiService.addComment(update);
-      this.#comments = [...this.#comments, newComment];
-      this._notify(updateType, newComment);
+      await this.#commentsApiService.addComment(update, film.id);
+
+      this._notify(updateType, film);
     } catch(err) {
       throw new Error('Can\'t add comment');
     }
   };
 
-  deleteComment = async (updateType, update) => {
+  deleteComment = async (updateType, update, film) => {
     const index = this.#comments.findIndex((comment) => comment.id === update.id);
 
     if (index === -1) {
@@ -40,12 +37,8 @@ export default class CommentsModel extends Observable {
 
     try {
       await this.#commentsApiService.deleteComment(update);
-      this.#comments = [
-        ...this.#comments.slice(0, index),
-        ...this.#comments.slice(index + 1),
-      ];
 
-      this._notify(updateType);
+      this._notify(updateType, film);
     } catch(err) {
       throw new Error('Can\'t delete comment');
     }

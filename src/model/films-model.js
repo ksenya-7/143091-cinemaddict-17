@@ -14,12 +14,6 @@ export default class FilmsModel extends Observable {
     return [...this.#films];
   }
 
-  set films(value) {
-    this.#films = value;
-
-    this._notify(UpdateType.MAJOR, value);
-  }
-
   init = async () => {
     try {
       const films = await this.#filmsApiService.films;

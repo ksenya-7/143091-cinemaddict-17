@@ -69,7 +69,8 @@ const createFilmPopupTemplate = (film) => {
   const genresTemplate = createGenresTemplate(film.genre);
 
   const comments = film.comments;
-  const commentsTemplate = createCommentsTemplate(film.comments, isDisabled, isDeleting);
+  // console.log(comments);
+  const commentsTemplate = createCommentsTemplate(comments, isDisabled, isDeleting);
 
   const watchlistClassName = film.watchlist ? 'film-details__control-button--active' : '';
   const watchedClassName = film.watched ? 'film-details__control-button--active' : '';
@@ -204,8 +205,8 @@ export default class FilmPopupView extends AbstractStatefulView {
     this.element.querySelector('.film-details__control-button--favorite').addEventListener('click', this.#favoritePopupClickHandler);
   };
 
-  setFormSubmitHandler = (callback) => {
-    this._callback.formSubmit = callback;
+  setAddSubmitHandler = (callback) => {
+    this._callback.addSubmit = callback;
     this.element.addEventListener('keydown', this.#commentAddSubmitHandler);
   };
 
@@ -240,16 +241,16 @@ export default class FilmPopupView extends AbstractStatefulView {
     this.setWatchlistPopupClickHandler(this._callback.watchlistPopupClick);
     this.setWatchedPopupClickHandler(this._callback.watchedPopupClick);
     this.setFavoritePopupClickHandler(this._callback.favoritePopupClick);
-    this.setFormSubmitHandler(this._callback.formSubmit);
+    this.setAddSubmitHandler(this._callback.addSubmit);
     this.setDeleteClickHandler(this._callback.deleteClick);
   };
 
   #emotionChangeHandler = (evt) => {
+    const scrollValue = this.element.scrollTop;
     this.updateElement({
       commentEmotion: evt.target.value,
-      scrollTop: this.element.scrollTop,
     });
-    // console.log(this.element.scrollTop);
+    this.element.scrollTop = scrollValue;
   };
 
   #commentInputHandler = (evt) => {
@@ -258,21 +259,21 @@ export default class FilmPopupView extends AbstractStatefulView {
       commentText: evt.target.value,
       scrollTop: this.element.scrollTop,
     });
-    // console.log(this.element.scrollTop);
   };
 
   #commentAddSubmitHandler = (evt) => {
     if (evt.ctrlKey && evt.key === 'Enter') {
-      this._callback.formSubmit(FilmPopupView.parseStateToFilm(this._state), FilmPopupView.newComment(this._state), this._state.scrollTop);
-      // console.log(this._state.scrollTop);
+      this._callback.addSubmit(FilmPopupView.parseStateToFilm(this._state), FilmPopupView.newComment(this._state), this._state.scrollTop);
     }
   };
 
   #commentDeleteClickHandler = (evt) => {
     evt.preventDefault();
     const idDelete = evt.target.dataset.buttonDelete;
-    this._callback.deleteClick(FilmPopupView.parseStateToFilm(this._state), this._state.comments, idDelete);
-    // FilmPopupView.scrollTop = this._state.scrollTop;
+    this._setState({
+      scrollTop: this.element.scrollTop,
+    });
+    this._callback.deleteClick(FilmPopupView.parseStateToFilm(this._state), this._state.comments, idDelete, this._state.scrollTop);
   };
 
   #setInnerHandlers = () => {
