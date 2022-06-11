@@ -96,13 +96,14 @@ export default class FilmsPresenter {
     this.#filmPopupComponent.element.shake(resetFormState);
   };
 
-  setDeleteAborting = (evt) => {
+  setDeleteAborting = (target) => {
     const resetFormState = () => {
       this.#filmPopupComponent.updateElement({
         isDisabled: false,
       });
     };
-    evt.target.closest('film-details__comment').shake(resetFormState);
+
+    target.closest('film-details__comment').shake(resetFormState);
   };
 
   #handleShowMoreButtonClick = () => {
@@ -354,8 +355,9 @@ export default class FilmsPresenter {
     try {
       await this.#commentsModel.deleteComment(UpdateType.PATCH, comment, film);
     } catch(err) {
-      this.#filmPresenter.get(film.id).setDeleteAborting();
+      this.#filmPresenter.get(film.id).setDeleteAborting(target);
     }
+
     this.#openFilmPopup(film, scrollTop);
 
     this.#uiBlocker.unblock();
