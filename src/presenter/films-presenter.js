@@ -12,22 +12,13 @@ import FilmPresenter from './film-presenter.js';
 import {sortFilmByDate, sortFilmByRating} from '../utils/film.js';
 import {filter} from '../utils/filter.js';
 import {SortType, UpdateType, FilterType} from '../const.js';
-// import CommentsModel from '../model/comments-model.js';
-// import CommentsApiService from '../api/comments-api-service.js';
 
-// const AUTHORIZATION = 'Basic ikf1Leyz2gj3gjkire4';
-// const END_POINT = 'https://17.ecmascript.pages.academy/cinemaddict';
 const FILM_COUNT_PER_STEP = 5;
 
 const TimeLimit = {
   LOWER_LIMIT: 350,
   UPPER_LIMIT: 1000,
 };
-
-// const Mode = {
-//   DEFAULT: 'DEFAULT',
-//   EDITING: 'EDITING',
-// };
 
 const body = document.querySelector('body');
 export default class FilmsPresenter {
@@ -52,8 +43,7 @@ export default class FilmsPresenter {
   #currentSortType = SortType.DEFAULT;
   #filterType = FilterType.ALL;
   #isLoading = true;
-  // #commentsApiService = new CommentsApiService(END_POINT, AUTHORIZATION);
-  // #mode = Mode.DEFAULT;
+
   #uiBlocker = new UiBlocker(TimeLimit.LOWER_LIMIT, TimeLimit.UPPER_LIMIT);
 
   constructor(filmsContainer, filterModel, filmsModel, commentsModel) {
@@ -86,32 +76,10 @@ export default class FilmsPresenter {
     this.#renderBoard();
   };
 
-  // setDeleting = () => {
-  //   if (this.#mode === Mode.EDITING) {
-  //     this.#filmPopupComponent.updateElement({
-  //       isDisabled: true,
-  //       isDeleting: true,
-  //     });
-  //   }
-  // };
-
-  setDeleting = () => {
-    this.#filmPopupComponent.updateElement({
-      isDisabled: true,
-      isDeleting: true,
-    });
-  };
-
   setAborting = () => {
-    // if (this.#mode === Mode.DEFAULT) {
-    //   this.#filmPopupComponent.shake();
-    //   return;
-    // }
-
     const resetFormState = () => {
       this.#filmPopupComponent.updateElement({
         isDisabled: false,
-        isDeleting: false,
       });
     };
 
@@ -218,11 +186,11 @@ export default class FilmsPresenter {
 
     document.addEventListener('keydown', this.#handleKeyDown);
     body.classList.add('hide-overflow');
+    this.#film.comments = this.#film.comments.map((el) => el.id);
 
     if (scrollTop) {
       this.#filmPopupComponent.element.scrollTop = scrollTop;
     }
-    // console.log(this.#filmPopupComponent.element.scrollTop);
   };
 
   #closeFilmPopup = () => {
@@ -291,10 +259,30 @@ export default class FilmsPresenter {
     }
   };
 
+  // #watchlistPopupClickHandler = async () => {
   #watchlistPopupClickHandler = () => {
     // this.#uiBlocker.block();
 
     const film = {...this.#film, watchlist: !this.#film.watchlist};
+
+    this.#filmsModel.updateFilm(UpdateType.MINOR, film);
+    // try {
+    //   await this.#filmsModel.updateFilm(UpdateType.MINOR, film);
+    // } catch(err) {
+    //   this.#filmPresenter.get(this.#film.id).setAborting();
+    // }
+
+    this.#openFilmPopup(film);
+    // console.log(this.#film);
+
+    // this.#uiBlocker.unblock();
+  };
+
+  // #watchedPopupClickHandler = async () => {
+  #watchedPopupClickHandler = () => {
+    // this.#uiBlocker.block();
+
+    const film = {...this.#film, watched: !this.#film.watched};
 
     this.#filmsModel.updateFilm(UpdateType.MINOR, film);
     // try {
@@ -308,49 +296,39 @@ export default class FilmsPresenter {
     // this.#uiBlocker.unblock();
   };
 
-  #watchedPopupClickHandler = async () => {
-    this.#uiBlocker.block();
-
-    const film = {...this.#film, watched: !this.#film.watched};
-
-    // this.#filmsModel.updateFilm(UpdateType.MINOR, film);
-    try {
-      await this.#filmsModel.updateFilm(UpdateType.MINOR, film);
-    } catch(err) {
-      this.#filmPresenter.get(film.id).setAborting();
-    }
-
-    this.#openFilmPopup(film);
-
-    this.#uiBlocker.unblock();
-  };
-
-  #favoritePopupClickHandler = async () => {
-    this.#uiBlocker.block();
+  // #favoritePopupClickHandler = async () => {
+  #favoritePopupClickHandler = () => {
+    // this.#uiBlocker.block();
 
     const film = {...this.#film, favorite: !this.#film.favorite};
 
-    // this.#filmsModel.updateFilm(UpdateType.MINOR, film);
-    try {
-      await this.#filmsModel.updateFilm(UpdateType.MINOR, film);
-    } catch(err) {
-      this.#filmPresenter.get(film.id).setAborting();
-    }
+    this.#filmsModel.updateFilm(UpdateType.MINOR, film);
+    // try {
+    //   await this.#filmsModel.updateFilm(UpdateType.MINOR, film);
+    // } catch(err) {
+    //   this.#filmPresenter.get(film.id).setAborting();
+    // }
 
     this.#openFilmPopup(film);
 
-    this.#uiBlocker.unblock();
+    // this.#uiBlocker.unblock();
   };
 
   #handleCommentAddHandler = async (film, comment, scrollTop) => {
+    this.#film = film;
+    this.#film = {...this.#film, isDisabled: true, scrollTop: `${scrollTop}`};
+    this.#filmPopupComponent.updateElement(this.#film);
+
     await this.#commentsModel.addComment(UpdateType.PATCH, comment, film);
     this.#openFilmPopup(film, scrollTop);
   };
 
-  #handleCommentDeleteHandler = async (film, comments, id, scrollTop) => {
+  #handleCommentDeleteHandler = async (film, comments, id, scrollTop, target) => {
     const comment = comments.find((item) => String(item.id) === id);
+    target.setAttribute('disabled', 'disabled');
+    target.textContent = 'Deleting...';
+
     await this.#commentsModel.deleteComment(UpdateType.PATCH, comment, film);
     this.#openFilmPopup(film, scrollTop);
-    // console.log(film);
   };
 }

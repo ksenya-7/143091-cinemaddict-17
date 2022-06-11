@@ -30,7 +30,7 @@ const createGenresTemplate = (genres) => {
   );
 };
 
-const createCommentsTemplate = (comments, isDisabled, isDeleting) => comments.map((comment) => {
+const createCommentsTemplate = (comments) => comments.map((comment) => {
   const commentDate = commentDateDiff(comment.date);
 
   return (
@@ -43,7 +43,7 @@ const createCommentsTemplate = (comments, isDisabled, isDeleting) => comments.ma
         <p class="film-details__comment-info">
           <span class="film-details__comment-author">${comment.author}</span>
           <span class="film-details__comment-day">${commentDate}</span>
-          <button class="film-details__comment-delete" data-button-delete="${comment.id}" ${isDisabled ? 'disabled' : ''}>${isDeleting ? 'Deleting...' : 'Delete'}</button>
+          <button class="film-details__comment-delete" data-button-delete="${comment.id}">Delete</button>
         </p>
       </div>
     </li>`);
@@ -57,7 +57,7 @@ const createEmotionsTemplate = (isDisabled) => EMOTIONS.map((el) => (
 
 
 const createFilmPopupTemplate = (film) => {
-  const {isDisabled, isDeleting} = film;
+  const {isDisabled} = film;
 
   const filmInfo = film['film_info'];
 
@@ -69,8 +69,7 @@ const createFilmPopupTemplate = (film) => {
   const genresTemplate = createGenresTemplate(film.genre);
 
   const comments = film.comments;
-  // console.log(comments);
-  const commentsTemplate = createCommentsTemplate(comments, isDisabled, isDeleting);
+  const commentsTemplate = createCommentsTemplate(comments);
 
   const watchlistClassName = film.watchlist ? 'film-details__control-button--active' : '';
   const watchedClassName = film.watched ? 'film-details__control-button--active' : '';
@@ -270,10 +269,11 @@ export default class FilmPopupView extends AbstractStatefulView {
   #commentDeleteClickHandler = (evt) => {
     evt.preventDefault();
     const idDelete = evt.target.dataset.buttonDelete;
+    const target = evt.target;
     this._setState({
       scrollTop: this.element.scrollTop,
     });
-    this._callback.deleteClick(FilmPopupView.parseStateToFilm(this._state), this._state.comments, idDelete, this._state.scrollTop);
+    this._callback.deleteClick(FilmPopupView.parseStateToFilm(this._state), this._state.comments, idDelete, this._state.scrollTop, target);
   };
 
   #setInnerHandlers = () => {
@@ -287,9 +287,7 @@ export default class FilmPopupView extends AbstractStatefulView {
       commentEmotion: '',
       scrollTop: '',
       isDisabled: false,
-      isDeleting: false,
     }
-
   );
 
   static parseStateToFilm = (state) => {
@@ -301,7 +299,6 @@ export default class FilmPopupView extends AbstractStatefulView {
     delete film.commentEmotion;
     delete film.scrollTop;
     delete film.isDisabled;
-    delete film.isDeleting;
 
     return film;
   };
