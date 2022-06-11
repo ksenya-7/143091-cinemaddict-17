@@ -184,6 +184,10 @@ export default class FilmPopupView extends AbstractStatefulView {
     return createFilmPopupTemplate(this._state);
   }
 
+  get controls() {
+    return this.element.querySelector('.film-details__controls');
+  }
+
   setCloseClickHandler = (callback) => {
     this._callback.closeClick = callback;
     this.element.querySelector('.film-details__close-btn').addEventListener('click', this.#closeClickHandler);

@@ -76,14 +76,33 @@ export default class FilmsPresenter {
     this.#renderBoard();
   };
 
-  setAborting = () => {
+  setControlsAborting = () => {
     const resetFormState = () => {
       this.#filmPopupComponent.updateElement({
         isDisabled: false,
       });
     };
 
-    this.#filmPopupComponent.shake(resetFormState);
+    this.#filmPopupComponent.controls.shake(resetFormState);
+  };
+
+  setAddAborting = () => {
+    const resetFormState = () => {
+      this.#filmPopupComponent.updateElement({
+        isDisabled: false,
+      });
+    };
+
+    this.#filmPopupComponent.element.shake(resetFormState);
+  };
+
+  setDeleteAborting = (evt) => {
+    const resetFormState = () => {
+      this.#filmPopupComponent.updateElement({
+        isDisabled: false,
+      });
+    };
+    evt.target.closest('film-details__comment').shake(resetFormState);
   };
 
   #handleShowMoreButtonClick = () => {
@@ -259,76 +278,86 @@ export default class FilmsPresenter {
     }
   };
 
-  // #watchlistPopupClickHandler = async () => {
-  #watchlistPopupClickHandler = () => {
-    // this.#uiBlocker.block();
+  #watchlistPopupClickHandler = async () => {
+    this.#uiBlocker.block();
 
     const film = {...this.#film, watchlist: !this.#film.watchlist};
 
-    this.#filmsModel.updateFilm(UpdateType.MINOR, film);
-    // try {
-    //   await this.#filmsModel.updateFilm(UpdateType.MINOR, film);
-    // } catch(err) {
-    //   this.#filmPresenter.get(this.#film.id).setAborting();
-    // }
+    try {
+      await this.#filmsModel.updateFilm(UpdateType.MINOR, film);
+    } catch(err) {
+      this.#filmPresenter.get(film.id).setControlsAborting();
+    }
 
     this.#openFilmPopup(film);
-    // console.log(this.#film);
 
-    // this.#uiBlocker.unblock();
+    this.#uiBlocker.unblock();
   };
 
-  // #watchedPopupClickHandler = async () => {
-  #watchedPopupClickHandler = () => {
-    // this.#uiBlocker.block();
+  #watchedPopupClickHandler = async () => {
+    this.#uiBlocker.block();
 
     const film = {...this.#film, watched: !this.#film.watched};
 
-    this.#filmsModel.updateFilm(UpdateType.MINOR, film);
-    // try {
-    //   await this.#filmsModel.updateFilm(UpdateType.MINOR, film);
-    // } catch(err) {
-    //   this.#filmPresenter.get(film.id).setAborting();
-    // }
+    try {
+      await this.#filmsModel.updateFilm(UpdateType.MINOR, film);
+    } catch(err) {
+      this.#filmPresenter.get(film.id).setControlsAborting();
+    }
 
     this.#openFilmPopup(film);
 
-    // this.#uiBlocker.unblock();
+    this.#uiBlocker.unblock();
   };
 
-  // #favoritePopupClickHandler = async () => {
-  #favoritePopupClickHandler = () => {
-    // this.#uiBlocker.block();
+  #favoritePopupClickHandler = async () => {
+    this.#uiBlocker.block();
 
     const film = {...this.#film, favorite: !this.#film.favorite};
 
-    this.#filmsModel.updateFilm(UpdateType.MINOR, film);
-    // try {
-    //   await this.#filmsModel.updateFilm(UpdateType.MINOR, film);
-    // } catch(err) {
-    //   this.#filmPresenter.get(film.id).setAborting();
-    // }
+    try {
+      await this.#filmsModel.updateFilm(UpdateType.MINOR, film);
+    } catch(err) {
+      this.#filmPresenter.get(film.id).setControlsAborting();
+    }
 
     this.#openFilmPopup(film);
 
-    // this.#uiBlocker.unblock();
+    this.#uiBlocker.unblock();
   };
 
   #handleCommentAddHandler = async (film, comment, scrollTop) => {
+    this.#uiBlocker.block();
+
     this.#film = film;
     this.#film = {...this.#film, isDisabled: true, scrollTop: `${scrollTop}`};
     this.#filmPopupComponent.updateElement(this.#film);
 
-    await this.#commentsModel.addComment(UpdateType.PATCH, comment, film);
+    try {
+      await this.#commentsModel.addComment(UpdateType.PATCH, comment, film);
+    } catch(err) {
+      this.#filmPresenter.get(film.id).setAddAborting();
+    }
+
     this.#openFilmPopup(film, scrollTop);
+
+    this.#uiBlocker.unblock();
   };
 
   #handleCommentDeleteHandler = async (film, comments, id, scrollTop, target) => {
+    this.#uiBlocker.block();
+
     const comment = comments.find((item) => String(item.id) === id);
     target.setAttribute('disabled', 'disabled');
     target.textContent = 'Deleting...';
 
-    await this.#commentsModel.deleteComment(UpdateType.PATCH, comment, film);
+    try {
+      await this.#commentsModel.deleteComment(UpdateType.PATCH, comment, film);
+    } catch(err) {
+      this.#filmPresenter.get(film.id).setDeleteAborting();
+    }
     this.#openFilmPopup(film, scrollTop);
+
+    this.#uiBlocker.unblock();
   };
 }
