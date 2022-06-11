@@ -295,6 +295,26 @@ export default class FilmsPresenter {
     this.#uiBlocker.unblock();
   };
 
+  //   #watchlistPopupClickHandler = async (film) => {
+  //   this.#uiBlocker.block();
+
+  //   this.#film = film;
+  //   console.log(film);
+
+  //   try {
+  //     await this.#filmsModel.updateFilm(
+  //       UpdateType.MINOR,
+  //       {...film, watchlist: !film.watchlist},
+  //     );
+  //   } catch(err) {
+  //     this.#filmPresenter.get(film.id).setControlsAborting();
+  //   }
+
+  //   this.#openFilmPopup(film);
+
+  //   this.#uiBlocker.unblock();
+  // };
+
   #watchedPopupClickHandler = async () => {
     this.#uiBlocker.block();
 

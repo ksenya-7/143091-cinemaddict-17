@@ -226,6 +226,10 @@ export default class FilmPopupView extends AbstractStatefulView {
     this._callback.closeClick();
   };
 
+  // #watchlistPopupClickHandler = () => {
+  //   this._callback.watchlistPopupClick(this._state);
+  // };
+
   #watchlistPopupClickHandler = () => {
     this._callback.watchlistPopupClick();
   };
