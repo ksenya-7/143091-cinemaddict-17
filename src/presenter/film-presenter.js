@@ -47,6 +47,37 @@ export default class FilmPresenter {
     remove(this.#filmComponent);
   };
 
+  setControlsAborting = (popupComponent) => {
+    const resetFormState = () => {
+      popupComponent.updateElement({
+        isDisabled: false,
+      });
+    };
+
+    popupComponent.controls.shakeControls(resetFormState);
+  };
+
+  setAddAborting = (popupComponent) => {
+    const resetFormState = () => {
+      popupComponent.updateElement({
+        isDisabled: false,
+      });
+    };
+
+    popupComponent.shake(resetFormState);
+  };
+
+  setDeleteAborting = (popupComponent, target) => {
+    const resetFormState = () => {
+      popupComponent.updateElement({
+        isDisabled: false,
+      });
+    };
+    const parentBlock = target.closest('film-details__comment');
+
+    parentBlock.shakeCommentDelete(resetFormState, parentBlock);
+  };
+
   #handleWatchlistClick = () => {
     this.#filmsModel.updateFilm(
       UpdateType.MINOR,

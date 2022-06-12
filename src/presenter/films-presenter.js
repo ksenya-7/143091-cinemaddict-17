@@ -76,36 +76,6 @@ export default class FilmsPresenter {
     this.#renderBoard();
   };
 
-  setControlsAborting = () => {
-    const resetFormState = () => {
-      this.#filmPopupComponent.updateElement({
-        isDisabled: false,
-      });
-    };
-
-    this.#filmPopupComponent.controls.shake(resetFormState);
-  };
-
-  setAddAborting = () => {
-    const resetFormState = () => {
-      this.#filmPopupComponent.updateElement({
-        isDisabled: false,
-      });
-    };
-
-    this.#filmPopupComponent.newCommentsField.shake(resetFormState);
-  };
-
-  setDeleteAborting = (target) => {
-    const resetFormState = () => {
-      this.#filmPopupComponent.updateElement({
-        isDisabled: false,
-      });
-    };
-
-    target.closest('film-details__comment').shake(resetFormState);
-  };
-
   #handleShowMoreButtonClick = () => {
     const filmCount = this.films.length;
     const newRenderedFilmCount = Math.min(filmCount, this.#renderedFilmCount + FILM_COUNT_PER_STEP);
@@ -288,7 +258,7 @@ export default class FilmsPresenter {
         {...film, watchlist: !film.watchlist},
       );
     } catch(err) {
-      this.#filmPresenter.get(film.id).setControlsAborting();
+      this.#filmPresenter.get(film.id).setControlsAborting(this.#filmPopupComponent);
     }
 
     this.#uiBlocker.unblock();
@@ -305,7 +275,7 @@ export default class FilmsPresenter {
         {...film, watched: !film.watched},
       );
     } catch(err) {
-      this.#filmPresenter.get(film.id).setControlsAborting();
+      this.#filmPresenter.get(film.id).setControlsAborting(this.#filmPopupComponent);
     }
 
     this.#uiBlocker.unblock();
@@ -322,7 +292,7 @@ export default class FilmsPresenter {
         {...film, favorite: !film.favorite},
       );
     } catch(err) {
-      this.#filmPresenter.get(film.id).setControlsAborting();
+      this.#filmPresenter.get(film.id).setControlsAborting(this.#filmPopupComponent);
     }
 
     this.#uiBlocker.unblock();
@@ -334,7 +304,7 @@ export default class FilmsPresenter {
     try {
       await this.#commentsModel.addComment(UpdateType.PATCH, comment, film);
     } catch(err) {
-      this.#filmPresenter.get(film.id).setAddAborting();
+      this.#filmPresenter.get(film.id).setAddAborting(this.#filmPopupComponent);
     }
 
     this.#openFilmPopup(film, scrollTop);
@@ -355,7 +325,7 @@ export default class FilmsPresenter {
     try {
       await this.#commentsModel.deleteComment(UpdateType.PATCH, comment, film);
     } catch(err) {
-      this.#filmPresenter.get(film.id).setDeleteAborting(target);
+      this.#filmPresenter.get(film.id).setDeleteAborting(this.#filmPopupComponent, target);
     }
 
     this.#openFilmPopup(film, scrollTop);

@@ -13,7 +13,6 @@ const createFilmCardTemplate = (film) => {
   const watchlistClassName = film.watchlist ? 'film-card__controls-item--active' : '';
   const watchedClassName = film.watched ? 'film-card__controls-item--active' : '';
   const favoriteClassName = film.favorite ? 'film-card__controls-item--active' : '';
-  // console.log(film.comments);
 
   return (
     `<article class="film-card">

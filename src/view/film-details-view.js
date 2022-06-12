@@ -5,6 +5,8 @@ import dayjs from 'dayjs';
 import he from 'he';
 
 const MONTH = 31;
+const SHAKE_CLASS_NAME = 'shake';
+const SHAKE_ANIMATION_TIMEOUT = 600;
 
 const commentDateDiff = (item) => {
   const diff = dayjs().diff(item, 'day');
@@ -187,8 +189,24 @@ export default class FilmPopupView extends AbstractStatefulView {
     return this.element.querySelector('.film-details__controls');
   }
 
-  get newCommentsField() {
+  get commentDeleteField() {
     return this.element.querySelector('.film-details__new-comment');
+  }
+
+  shakeControls(callback) {
+    this.controls.classList.add(SHAKE_CLASS_NAME);
+    setTimeout(() => {
+      this.controls.classList.remove(SHAKE_CLASS_NAME);
+      callback?.();
+    }, SHAKE_ANIMATION_TIMEOUT);
+  }
+
+  shakeCommentDelete(callback, block) {
+    block.classList.add(SHAKE_CLASS_NAME);
+    setTimeout(() => {
+      block.classList.remove(SHAKE_CLASS_NAME);
+      callback?.();
+    }, SHAKE_ANIMATION_TIMEOUT);
   }
 
   setCloseClickHandler = (callback) => {
