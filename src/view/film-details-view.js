@@ -56,7 +56,7 @@ const createEmotionsTemplate = (isDisabled) => EMOTIONS.map((el) => (
     </label>`)).join('');
 
 
-const createFilmPopupTemplate = (film) => {
+const createFilmPopupTemplate = (film, comments) => {
   const {isDisabled} = film;
 
   const filmInfo = film['film_info'];
@@ -68,7 +68,7 @@ const createFilmPopupTemplate = (film) => {
 
   const genresTemplate = createGenresTemplate(film.genre);
 
-  const comments = film.comments;
+  // const comments = film.comments;
   const commentsTemplate = createCommentsTemplate(comments);
 
   const watchlistClassName = film.watchlist ? 'film-details__control-button--active' : '';
@@ -173,15 +173,16 @@ const createFilmPopupTemplate = (film) => {
 };
 
 export default class FilmPopupView extends AbstractStatefulView {
-  constructor(film) {
+  constructor(film, comments) {
     super();
 
     this._state = FilmPopupView.parseFilmToState(film);
+    this._comments = comments;
     this.#setInnerHandlers();
   }
 
   get template() {
-    return createFilmPopupTemplate(this._state);
+    return createFilmPopupTemplate(this._state, this._comments);
   }
 
   get controls() {
@@ -270,6 +271,9 @@ export default class FilmPopupView extends AbstractStatefulView {
 
   #commentAddSubmitHandler = (evt) => {
     if (evt.ctrlKey && evt.key === 'Enter') {
+      // this._setState({
+      //   isDisabled: true,
+      // });
       this._callback.addSubmit(FilmPopupView.parseStateToFilm(this._state), FilmPopupView.newComment(this._state), this._state.scrollTop);
     }
   };
@@ -280,8 +284,9 @@ export default class FilmPopupView extends AbstractStatefulView {
     const target = evt.target;
     this._setState({
       scrollTop: this.element.scrollTop,
+      // isDisabled: true,
     });
-    this._callback.deleteClick(FilmPopupView.parseStateToFilm(this._state), this._state.comments, idDelete, this._state.scrollTop, target);
+    this._callback.deleteClick(FilmPopupView.parseStateToFilm(this._state), idDelete, this._state.scrollTop, target);
   };
 
   #setInnerHandlers = () => {

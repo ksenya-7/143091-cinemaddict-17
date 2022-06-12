@@ -193,9 +193,8 @@ export default class FilmsPresenter {
     }
 
     const comments = await this.#commentsModel.getComments(film.id);
-    this.#film.comments = comments;
 
-    this.#filmPopupComponent = new FilmPopupView(this.#film);
+    this.#filmPopupComponent = new FilmPopupView(this.#film, comments);
     this.#filmPopupComponent.setCloseClickHandler(this.#closeFilmPopup);
     this.#filmPopupComponent.setWatchlistPopupClickHandler(this.#watchlistPopupClickHandler);
     this.#filmPopupComponent.setWatchedPopupClickHandler(this.#watchedPopupClickHandler);
@@ -206,7 +205,6 @@ export default class FilmsPresenter {
 
     document.addEventListener('keydown', this.#handleKeyDown);
     body.classList.add('hide-overflow');
-    this.#film.comments = this.#film.comments.map((el) => el.id);
 
     if (scrollTop) {
       this.#filmPopupComponent.element.scrollTop = scrollTop;
@@ -350,10 +348,6 @@ export default class FilmsPresenter {
   #handleCommentAddHandler = async (film, comment, scrollTop) => {
     this.#uiBlocker.block();
 
-    this.#film = film;
-    this.#film = {...this.#film, isDisabled: true, scrollTop: `${scrollTop}`};
-    this.#filmPopupComponent.updateElement(this.#film);
-
     try {
       await this.#commentsModel.addComment(UpdateType.PATCH, comment, film);
     } catch(err) {
@@ -365,10 +359,13 @@ export default class FilmsPresenter {
     this.#uiBlocker.unblock();
   };
 
-  #handleCommentDeleteHandler = async (film, comments, id, scrollTop, target) => {
+  #handleCommentDeleteHandler = async (film, id, scrollTop, target) => {
     this.#uiBlocker.block();
 
-    const comment = comments.find((item) => String(item.id) === id);
+    const commentsById = await this.#commentsModel.getComments(film.id);
+    const comment = commentsById.find((item) => String(item.id) === id);
+    const index = commentsById.findIndex((item) => String(item.id) === id);
+    film.comments.splice(index, 1);
     target.setAttribute('disabled', 'disabled');
     target.textContent = 'Deleting...';
 
