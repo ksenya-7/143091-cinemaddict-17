@@ -67,8 +67,6 @@ const createFilmPopupTemplate = (film, comments) => {
   const runtime = getTimeFromMins(filmInfo['runtime']);
 
   const genresTemplate = createGenresTemplate(film.genre);
-
-  // const comments = film.comments;
   const commentsTemplate = createCommentsTemplate(comments);
 
   const watchlistClassName = film.watchlist ? 'film-details__control-button--active' : '';
@@ -189,6 +187,10 @@ export default class FilmPopupView extends AbstractStatefulView {
     return this.element.querySelector('.film-details__controls');
   }
 
+  get newCommentsField() {
+    return this.element.querySelector('.film-details__new-comment');
+  }
+
   setCloseClickHandler = (callback) => {
     this._callback.closeClick = callback;
     this.element.querySelector('.film-details__close-btn').addEventListener('click', this.#closeClickHandler);
@@ -227,20 +229,16 @@ export default class FilmPopupView extends AbstractStatefulView {
     this._callback.closeClick();
   };
 
-  // #watchlistPopupClickHandler = () => {
-  //   this._callback.watchlistPopupClick(this._state);
-  // };
-
   #watchlistPopupClickHandler = () => {
-    this._callback.watchlistPopupClick();
+    this._callback.watchlistPopupClick(this._state);
   };
 
   #watchedPopupClickHandler = () => {
-    this._callback.watchedPopupClick();
+    this._callback.watchedPopupClick(this._state);
   };
 
   #favoritePopupClickHandler = () => {
-    this._callback.favoritePopupClick();
+    this._callback.favoritePopupClick(this._state);
   };
 
   _restoreHandlers = () => {

@@ -93,7 +93,7 @@ export default class FilmsPresenter {
       });
     };
 
-    this.#filmPopupComponent.element.shake(resetFormState);
+    this.#filmPopupComponent.newCommentsField.shake(resetFormState);
   };
 
   setDeleteAborting = (target) => {
@@ -277,70 +277,53 @@ export default class FilmsPresenter {
     }
   };
 
-  #watchlistPopupClickHandler = async () => {
+  #watchlistPopupClickHandler = async (film) => {
     this.#uiBlocker.block();
 
-    const film = {...this.#film, watchlist: !this.#film.watchlist};
+    this.#filmPopupComponent.updateElement({watchlist: !film.watchlist});
 
     try {
-      await this.#filmsModel.updateFilm(UpdateType.MINOR, film);
+      await this.#filmsModel.updateFilm(
+        UpdateType.MINOR,
+        {...film, watchlist: !film.watchlist},
+      );
     } catch(err) {
       this.#filmPresenter.get(film.id).setControlsAborting();
     }
-
-    this.#openFilmPopup(film);
 
     this.#uiBlocker.unblock();
   };
 
-  //   #watchlistPopupClickHandler = async (film) => {
-  //   this.#uiBlocker.block();
-
-  //   this.#film = film;
-  //   console.log(film);
-
-  //   try {
-  //     await this.#filmsModel.updateFilm(
-  //       UpdateType.MINOR,
-  //       {...film, watchlist: !film.watchlist},
-  //     );
-  //   } catch(err) {
-  //     this.#filmPresenter.get(film.id).setControlsAborting();
-  //   }
-
-  //   this.#openFilmPopup(film);
-
-  //   this.#uiBlocker.unblock();
-  // };
-
-  #watchedPopupClickHandler = async () => {
+  #watchedPopupClickHandler = async (film) => {
     this.#uiBlocker.block();
 
-    const film = {...this.#film, watched: !this.#film.watched};
+    this.#filmPopupComponent.updateElement({watched: !film.watched});
 
     try {
-      await this.#filmsModel.updateFilm(UpdateType.MINOR, film);
+      await this.#filmsModel.updateFilm(
+        UpdateType.MINOR,
+        {...film, watched: !film.watched},
+      );
     } catch(err) {
       this.#filmPresenter.get(film.id).setControlsAborting();
     }
-
-    this.#openFilmPopup(film);
 
     this.#uiBlocker.unblock();
   };
 
-  #favoritePopupClickHandler = async () => {
+  #favoritePopupClickHandler = async (film) => {
     this.#uiBlocker.block();
 
-    const film = {...this.#film, favorite: !this.#film.favorite};
+    this.#filmPopupComponent.updateElement({favorite: !film.favorite});
 
     try {
-      await this.#filmsModel.updateFilm(UpdateType.MINOR, film);
+      await this.#filmsModel.updateFilm(
+        UpdateType.MINOR,
+        {...film, favorite: !film.favorite},
+      );
     } catch(err) {
       this.#filmPresenter.get(film.id).setControlsAborting();
     }
-
-    this.#openFilmPopup(film);
 
     this.#uiBlocker.unblock();
   };
