@@ -250,15 +250,15 @@ export default class FilmsPresenter {
   #watchlistPopupClickHandler = async (film) => {
     this.#uiBlocker.block();
 
-    this.#filmPopupComponent.updateElement({watchlist: !film.watchlist});
-
     try {
       await this.#filmsModel.updateFilm(
         UpdateType.MINOR,
         {...film, watchlist: !film.watchlist},
       );
+
+      this.#filmPopupComponent.updateElement({watchlist: !film.watchlist});
     } catch(err) {
-      this.#filmPresenter.get(film.id).setControlsAborting(this.#filmPopupComponent);
+      this.#filmPresenter.get(film.id).setPopupControlsAborting(this.#filmPopupComponent);
     }
 
     this.#uiBlocker.unblock();
@@ -267,15 +267,15 @@ export default class FilmsPresenter {
   #watchedPopupClickHandler = async (film) => {
     this.#uiBlocker.block();
 
-    this.#filmPopupComponent.updateElement({watched: !film.watched});
-
     try {
       await this.#filmsModel.updateFilm(
         UpdateType.MINOR,
         {...film, watched: !film.watched},
       );
+
+      this.#filmPopupComponent.updateElement({watched: !film.watched});
     } catch(err) {
-      this.#filmPresenter.get(film.id).setControlsAborting(this.#filmPopupComponent);
+      this.#filmPresenter.get(film.id).setPopupControlsAborting(this.#filmPopupComponent);
     }
 
     this.#uiBlocker.unblock();
@@ -284,15 +284,15 @@ export default class FilmsPresenter {
   #favoritePopupClickHandler = async (film) => {
     this.#uiBlocker.block();
 
-    this.#filmPopupComponent.updateElement({favorite: !film.favorite});
-
     try {
       await this.#filmsModel.updateFilm(
         UpdateType.MINOR,
         {...film, favorite: !film.favorite},
       );
+
+      this.#filmPopupComponent.updateElement({favorite: !film.favorite});
     } catch(err) {
-      this.#filmPresenter.get(film.id).setControlsAborting(this.#filmPopupComponent);
+      this.#filmPresenter.get(film.id).setPopupControlsAborting(this.#filmPopupComponent);
     }
 
     this.#uiBlocker.unblock();
@@ -303,11 +303,10 @@ export default class FilmsPresenter {
 
     try {
       await this.#commentsModel.addComment(UpdateType.PATCH, comment, film);
+      this.#openFilmPopup(film, scrollTop);
     } catch(err) {
       this.#filmPresenter.get(film.id).setAddAborting(this.#filmPopupComponent);
     }
-
-    this.#openFilmPopup(film, scrollTop);
 
     this.#uiBlocker.unblock();
   };
@@ -324,11 +323,12 @@ export default class FilmsPresenter {
 
     try {
       await this.#commentsModel.deleteComment(UpdateType.PATCH, comment, film);
+      this.#openFilmPopup(film, scrollTop);
     } catch(err) {
+      target.textContent = 'Delete';
+      target.removeAttribute('disabled', 'disabled');
       this.#filmPresenter.get(film.id).setDeleteAborting(this.#filmPopupComponent, target);
     }
-
-    this.#openFilmPopup(film, scrollTop);
 
     this.#uiBlocker.unblock();
   };

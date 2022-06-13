@@ -1,6 +1,12 @@
 import {render, replace, remove} from '../framework/render.js';
+import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 import FilmCardView from '../view/film-card-view.js';
 import {UpdateType} from '../const.js';
+
+const TimeLimit = {
+  LOWER_LIMIT: 350,
+  UPPER_LIMIT: 1000,
+};
 
 export default class FilmPresenter {
   #filmListContainer = null;
@@ -9,6 +15,8 @@ export default class FilmPresenter {
 
   #film = null;
   #filmsModel = null;
+
+  #uiBlocker = new UiBlocker(TimeLimit.LOWER_LIMIT, TimeLimit.UPPER_LIMIT);
 
   constructor(filmListContainer, openFilmPopup, filmsModel) {
     this.#filmListContainer = filmListContainer;
@@ -47,14 +55,24 @@ export default class FilmPresenter {
     remove(this.#filmComponent);
   };
 
-  setControlsAborting = (popupComponent) => {
+  setControlsAborting = () => {
+    const resetFormState = () => {
+      this.#filmComponent.updateElement({
+        isDisabled: false,
+      });
+    };
+
+    this.#filmComponent.shakeControls(resetFormState);
+  };
+
+  setPopupControlsAborting = (popupComponent) => {
     const resetFormState = () => {
       popupComponent.updateElement({
         isDisabled: false,
       });
     };
 
-    popupComponent.controls.shakeControls(resetFormState);
+    popupComponent.shakeControls(resetFormState);
   };
 
   setAddAborting = (popupComponent) => {
@@ -73,29 +91,53 @@ export default class FilmPresenter {
         isDisabled: false,
       });
     };
-    const parentBlock = target.closest('film-details__comment');
+    const parentBlock = target.closest('.film-details__comment');
 
-    parentBlock.shakeCommentDelete(resetFormState, parentBlock);
+    popupComponent.shakeCommentDelete(resetFormState, parentBlock);
   };
 
-  #handleWatchlistClick = () => {
-    this.#filmsModel.updateFilm(
-      UpdateType.MINOR,
-      {...this.#film, watchlist: !this.#film.watchlist},
-    );
+  #handleWatchlistClick = async () => {
+    this.#uiBlocker.block();
+
+    try {
+      await this.#filmsModel.updateFilm(
+        UpdateType.MINOR,
+        {...this.#film, watchlist: !this.#film.watchlist},
+      );
+    } catch(err) {
+      this.setControlsAborting();
+    }
+
+    this.#uiBlocker.unblock();
   };
 
-  #handleWatchedClick = () => {
-    this.#filmsModel.updateFilm(
-      UpdateType.MINOR,
-      {...this.#film, watched: !this.#film.watched},
-    );
+  #handleWatchedClick = async () => {
+    this.#uiBlocker.block();
+
+    try {
+      await this.#filmsModel.updateFilm(
+        UpdateType.MINOR,
+        {...this.#film, watched: !this.#film.watched},
+      );
+    } catch(err) {
+      this.setControlsAborting();
+    }
+
+    this.#uiBlocker.unblock();
   };
 
-  #handleFavoriteClick = () => {
-    this.#filmsModel.updateFilm(
-      UpdateType.MINOR,
-      {...this.#film, favorite: !this.#film.favorite},
-    );
+  #handleFavoriteClick = async () => {
+    this.#uiBlocker.block();
+
+    try {
+      await this.#filmsModel.updateFilm(
+        UpdateType.MINOR,
+        {...this.#film, favorite: !this.#film.favorite},
+      );
+    } catch(err) {
+      this.setControlsAborting();
+    }
+
+    this.#uiBlocker.unblock();
   };
 }
