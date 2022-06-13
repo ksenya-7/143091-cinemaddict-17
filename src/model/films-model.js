@@ -14,16 +14,10 @@ export default class FilmsModel extends Observable {
     return [...this.#films];
   }
 
-  set films(value) {
-    this.#films = value;
-
-    this._notify(UpdateType.MAJOR, value);
-  }
-
   init = async () => {
     try {
       const films = await this.#filmsApiService.films;
-      this.#films = films.map(this.#adaptToClient);
+      this.#films = films.map(FilmsModel.adaptToClient);
     } catch(err) {
       this.#films = [];
     }
@@ -31,7 +25,7 @@ export default class FilmsModel extends Observable {
     this._notify(UpdateType.INIT);
   };
 
-  updateFilm = async(updateType, update) => {
+  updateFilm = async (updateType, update) => {
     const index = this.#films.findIndex((film) => film.id === update.id);
 
     if (index === -1) {
@@ -40,21 +34,22 @@ export default class FilmsModel extends Observable {
 
     try {
       const response = await this.#filmsApiService.updateFilm(update);
-      const updatedFilm = this.#adaptToClient(response);
+      const updatedFilm = FilmsModel.adaptToClient(response);
+
       this.#films = [
         ...this.#films.slice(0, index),
         updatedFilm,
         ...this.#films.slice(index + 1),
       ];
+
       this._notify(updateType, updatedFilm);
     } catch(err) {
       throw new Error('Can\'t update film');
     }
   };
 
-  #adaptToClient = (film) => {
+  static adaptToClient = (film) => {
     const adaptedFilm = {...film,
-      amountComments: film['comments'].length,
       genre: film['film_info']['genre'],
       watchlist: film['user_details']['watchlist'],
       watched: film['user_details']['already_watched'],

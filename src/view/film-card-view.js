@@ -1,9 +1,11 @@
 import AbstractView from '../framework/view/abstract-view.js';
-
 import {getTimeFromMins, humanizeFilmReleaseYear} from '../utils/film.js';
 
+const SHAKE_CLASS_NAME = 'shake';
+const SHAKE_ANIMATION_TIMEOUT = 600;
+
 const createFilmCardTemplate = (film) => {
-  const {genre, amountComments} = film;
+  const {genre} = film;
 
   const filmInfo = film['film_info'];
   const releaseDate = filmInfo['release']['date'];
@@ -26,7 +28,7 @@ const createFilmCardTemplate = (film) => {
         </p>
         <img src="./${filmInfo['poster']}" alt="" class="film-card__poster">
         <p class="film-card__description">${filmInfo['description']}</p>
-        <span class="film-card__comments">${amountComments} comments</span>
+        <span class="film-card__comments">${film['comments'].length} comments</span>
       </a>
       <div class="film-card__controls">
         <button class="film-card__controls-item film-card__controls-item--add-to-watchlist ${watchlistClassName}" type="button">Add to watchlist</button>
@@ -47,6 +49,18 @@ export default class FilmCardView extends AbstractView {
 
   get template() {
     return createFilmCardTemplate(this.#film);
+  }
+
+  get controls() {
+    return this.element.querySelector('.film-card__controls');
+  }
+
+  shakeControls(callback) {
+    this.controls.classList.add(SHAKE_CLASS_NAME);
+    setTimeout(() => {
+      this.controls.classList.remove(SHAKE_CLASS_NAME);
+      callback?.();
+    }, SHAKE_ANIMATION_TIMEOUT);
   }
 
   setOpenClickHandler = (callback) => {

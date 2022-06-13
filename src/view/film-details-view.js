@@ -2,13 +2,16 @@ import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import {getTimeFromMins, humanizeFilmReleaseDate} from '../utils/film.js';
 import {EMOTIONS} from '../const.js';
 import dayjs from 'dayjs';
-import {nanoid} from 'nanoid';
 import he from 'he';
+
+const MONTH = 31;
+const SHAKE_CLASS_NAME = 'shake';
+const SHAKE_ANIMATION_TIMEOUT = 600;
 
 const commentDateDiff = (item) => {
   const diff = dayjs().diff(item, 'day');
 
-  if (item.includes('day') || diff > 31) {
+  if (item.includes('day') || diff > MONTH) {
     return item;
   } else if (diff === 0) {
     return 'Today';
@@ -42,22 +45,22 @@ const createCommentsTemplate = (comments) => comments.map((comment) => {
         <p class="film-details__comment-info">
           <span class="film-details__comment-author">${comment.author}</span>
           <span class="film-details__comment-day">${commentDate}</span>
-
           <button class="film-details__comment-delete" data-button-delete="${comment.id}">Delete</button>
-
         </p>
       </div>
     </li>`);
 }).join('');
 
-const createEmotionsTemplate = () => EMOTIONS.map((el) => (
-  `<input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${el}" value="${el}">
+const createEmotionsTemplate = (isDisabled) => EMOTIONS.map((el) => (
+  `<input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${el}" value="${el}" ${isDisabled ? 'disabled' : ''}>
     <label class="film-details__emoji-label" for="emoji-${el}">
       <img src="./images/emoji/${el}.png" width="30" height="30" alt="emoji-${el}">
     </label>`)).join('');
 
 
-const createFilmPopupTemplate = (film) => {
+const createFilmPopupTemplate = (film, comments) => {
+  const {isDisabled} = film;
+
   const filmInfo = film['film_info'];
 
   const releaseDate = filmInfo['release']['date'];
@@ -65,17 +68,14 @@ const createFilmPopupTemplate = (film) => {
 
   const runtime = getTimeFromMins(filmInfo['runtime']);
 
-  const genre = film.genre;
-  const genresTemplate = createGenresTemplate(genre);
-
-  const comments = film.comments;
-  const commentsTemplate = createCommentsTemplate(film.comments);
+  const genresTemplate = createGenresTemplate(film.genre);
+  const commentsTemplate = createCommentsTemplate(comments);
 
   const watchlistClassName = film.watchlist ? 'film-details__control-button--active' : '';
   const watchedClassName = film.watched ? 'film-details__control-button--active' : '';
   const favoriteClassName = film.favorite ? 'film-details__control-button--active' : '';
 
-  const emotionsTemplate = createEmotionsTemplate();
+  const emotionsTemplate = createEmotionsTemplate(isDisabled);
 
   return (
     `<section class="film-details">
@@ -134,15 +134,15 @@ const createFilmPopupTemplate = (film) => {
               </table>
 
               <p class="film-details__film-description">
-                ${he.encode(filmInfo['description'])}
+                ${filmInfo['description']}
               </p>
             </div>
           </div>
 
           <section class="film-details__controls">
-            <button type="button" class="film-details__control-button ${watchlistClassName} film-details__control-button--watchlist" id="watchlist" name="watchlist">Add to watchlist</button>
-            <button type="button" class="film-details__control-button ${watchedClassName} film-details__control-button--watched" id="watched" name="watched">Already watched</button>
-            <button type="button" class="film-details__control-button ${favoriteClassName} film-details__control-button--favorite" id="favorite" name="favorite">Add to favorites</button>
+            <button type="button" class="film-details__control-button ${watchlistClassName} film-details__control-button--watchlist" id="watchlist" name="watchlist" ${isDisabled ? 'disabled' : ''}>Add to watchlist</button>
+            <button type="button" class="film-details__control-button ${watchedClassName} film-details__control-button--watched" id="watched" name="watched" ${isDisabled ? 'disabled' : ''}>Already watched</button>
+            <button type="button" class="film-details__control-button ${favoriteClassName} film-details__control-button--favorite" id="favorite" name="favorite" ${isDisabled ? 'disabled' : ''}>Add to favorites</button>
           </section>
         </div>
 
@@ -158,7 +158,7 @@ const createFilmPopupTemplate = (film) => {
               </div>
 
               <label class="film-details__comment-label">
-                <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${film.commentText ? `${film.commentText}` : ''}</textarea>
+                <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment" ${isDisabled ? 'disabled' : ''}>${film.commentText ? `${he.encode(film.commentText)}` : ''}</textarea>
               </label>
 
               <div class="film-details__emoji-list">
@@ -173,16 +173,49 @@ const createFilmPopupTemplate = (film) => {
 };
 
 export default class FilmPopupView extends AbstractStatefulView {
-  constructor(film) {
+  _scrollTop = 0;
+
+  constructor(film, comments) {
     super();
 
     this._state = FilmPopupView.parseFilmToState(film);
+    this._comments = comments;
     this.#setInnerHandlers();
   }
 
   get template() {
-    return createFilmPopupTemplate(this._state);
+    return createFilmPopupTemplate(this._state, this._comments);
   }
+
+  get controls() {
+    return this.element.querySelector('.film-details__controls');
+  }
+
+  shakeControls(callback) {
+    this.controls.classList.add(SHAKE_CLASS_NAME);
+    setTimeout(() => {
+      this.controls.classList.remove(SHAKE_CLASS_NAME);
+      callback?.();
+    }, SHAKE_ANIMATION_TIMEOUT);
+  }
+
+  shakeCommentDelete(callback, block) {
+    block.classList.add(SHAKE_CLASS_NAME);
+    setTimeout(() => {
+      block.classList.remove(SHAKE_CLASS_NAME);
+      callback?.();
+    }, SHAKE_ANIMATION_TIMEOUT);
+  }
+
+  updateElementByComments = (updateComments, update) => {
+    if (!updateComments) {
+      return;
+    }
+
+    this._setStateComments(updateComments, update);
+
+    this.#rerenderElementByComments();
+  };
 
   setCloseClickHandler = (callback) => {
     this._callback.closeClick = callback;
@@ -204,9 +237,9 @@ export default class FilmPopupView extends AbstractStatefulView {
     this.element.querySelector('.film-details__control-button--favorite').addEventListener('click', this.#favoritePopupClickHandler);
   };
 
-  setFormSubmitHandler = (callback) => {
-    this._callback.formSubmit = callback;
-    this.element.addEventListener('keydown', this.#formSubmitHandler);
+  setAddSubmitHandler = (callback) => {
+    this._callback.addSubmit = callback;
+    this.element.addEventListener('keydown', this.#commentAddSubmitHandler);
   };
 
   setDeleteClickHandler = (callback) => {
@@ -218,20 +251,9 @@ export default class FilmPopupView extends AbstractStatefulView {
     });
   };
 
-  #closeClickHandler = () => {
-    this._callback.closeClick();
-  };
-
-  #watchlistPopupClickHandler = () => {
-    this._callback.watchlistPopupClick();
-  };
-
-  #watchedPopupClickHandler = () => {
-    this._callback.watchedPopupClick();
-  };
-
-  #favoritePopupClickHandler = () => {
-    this._callback.favoritePopupClick();
+  _setStateComments = (updateComments, update) => {
+    this._comments = updateComments;
+    this._state = {...this._state, ...update};
   };
 
   _restoreHandlers = () => {
@@ -240,11 +262,46 @@ export default class FilmPopupView extends AbstractStatefulView {
     this.setWatchlistPopupClickHandler(this._callback.watchlistPopupClick);
     this.setWatchedPopupClickHandler(this._callback.watchedPopupClick);
     this.setFavoritePopupClickHandler(this._callback.favoritePopupClick);
-    this.setFormSubmitHandler(this._callback.formSubmit);
+    this.setAddSubmitHandler(this._callback.addSubmit);
     this.setDeleteClickHandler(this._callback.deleteClick);
+    this.element.scrollTop = this._scrollTop;
+  };
+
+  #rerenderElementByComments = () => {
+    const prevElement = this.element;
+    const parent = prevElement.parentElement;
+    this.removeElement();
+    this._setState({
+      commentText: '',
+      commentEmotion: '',
+    });
+    const newElement = this.element;
+    parent.replaceChild(newElement, prevElement);
+
+    this._restoreHandlers();
+  };
+
+  #closeClickHandler = () => {
+    this._callback.closeClick();
+  };
+
+  #watchlistPopupClickHandler = () => {
+    this._scrollTop = this.element.scrollTop;
+    this._callback.watchlistPopupClick(this._state);
+  };
+
+  #watchedPopupClickHandler = () => {
+    this._scrollTop = this.element.scrollTop;
+    this._callback.watchedPopupClick(this._state);
+  };
+
+  #favoritePopupClickHandler = () => {
+    this._scrollTop = this.element.scrollTop;
+    this._callback.favoritePopupClick(this._state);
   };
 
   #emotionChangeHandler = (evt) => {
+    this._scrollTop = this.element.scrollTop;
     this.updateElement({
       commentEmotion: evt.target.value,
     });
@@ -252,21 +309,31 @@ export default class FilmPopupView extends AbstractStatefulView {
 
   #commentInputHandler = (evt) => {
     evt.preventDefault();
+    this._scrollTop = this.element.scrollTop;
     this._setState({
       commentText: evt.target.value,
     });
   };
 
-  #formSubmitHandler = (evt) => {
+  #commentAddSubmitHandler = (evt) => {
     if (evt.ctrlKey && evt.key === 'Enter') {
-      this._callback.formSubmit(FilmPopupView.parseStateToFilm(this._state), FilmPopupView.newComment(this._state));
+      this._scrollTop = this.element.scrollTop;
+      this._setState({
+        isDisabled: true,
+      });
+      this._callback.addSubmit(FilmPopupView.parseStateToFilm(this._state), FilmPopupView.newComment(this._state));
     }
   };
 
   #commentDeleteClickHandler = (evt) => {
     evt.preventDefault();
     const idDelete = evt.target.dataset.buttonDelete;
-    this._callback.deleteClick(FilmPopupView.parseStateToFilm(this._state), this._state.comments, idDelete);
+    const target = evt.target;
+    this._scrollTop = this.element.scrollTop;
+    this._setState({
+      isDisabled: true,
+    });
+    this._callback.deleteClick(FilmPopupView.parseStateToFilm(this._state), idDelete, target, this._comments);
   };
 
   #setInnerHandlers = () => {
@@ -278,6 +345,7 @@ export default class FilmPopupView extends AbstractStatefulView {
     {...film,
       commentText: '',
       commentEmotion: '',
+      isDisabled: false,
     }
   );
 
@@ -288,15 +356,13 @@ export default class FilmPopupView extends AbstractStatefulView {
 
     delete film.commentText;
     delete film.commentEmotion;
+    delete film.isDisabled;
 
     return film;
   };
 
   static newComment = (state) => ({
-    id: nanoid(),
-    author: 'John Doe',
     comment: state.commentText,
-    date: dayjs().format('YYYY/MM/DD HH:mm'),
     emotion: state.commentEmotion,
   });
 }

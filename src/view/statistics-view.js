@@ -1,6 +1,6 @@
 import AbstractView from '../framework/view/abstract-view.js';
 
-const createStatisticsTemplate = (length) => `<p>${length ?? 0} movies inside</p>`;
+const createStatisticsTemplate = (count) => `<p>${count} movies inside</p>`;
 
 export default class StatisticsView extends AbstractView {
   #films = null;

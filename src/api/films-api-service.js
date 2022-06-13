@@ -1,21 +1,16 @@
 import ApiService from '../framework/api-service.js';
 
-const Method = {
-  GET: 'GET',
-  PUT: 'PUT',
-};
-
 export default class FilmsApiService extends ApiService {
   get films() {
     return this._load({url: 'movies'})
       .then(ApiService.parseResponse);
   }
 
-  updateFilm = async (movie) => {
+  updateFilm = async (film) => {
     const response = await this._load({
-      url: `movies/${movie.id}`,
-      method: Method.PUT,
-      body: JSON.stringify(this.#adaptToServer(movie)),
+      url: `movies/${film.id}`,
+      method: 'PUT',
+      body: JSON.stringify(this.#adaptToServer(film)),
       headers: new Headers({'Content-Type': 'application/json'}),
     });
 
@@ -31,12 +26,11 @@ export default class FilmsApiService extends ApiService {
       },
       'user_details': {...film['user_details'],
         'watchlist': film.watchlist,
-        'watched': film.watched,
+        'already_watched': film.watched,
         'favorite': film.favorite,
       }
     };
 
-    delete adaptedFilm.amountComments;
     delete adaptedFilm.genre;
     delete adaptedFilm.watchlist;
     delete adaptedFilm.watched;

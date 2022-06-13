@@ -1,4 +1,5 @@
 import {render, remove, RenderPosition} from '../framework/render.js';
+import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 import FilmsView from '../view/films-view.js';
 import FilmsListView from '../view/films-list-view.js';
 import FilmsContainerView from '../view/films-container-view.js';
@@ -11,18 +12,20 @@ import FilmPresenter from './film-presenter.js';
 import {sortFilmByDate, sortFilmByRating} from '../utils/film.js';
 import {filter} from '../utils/filter.js';
 import {SortType, UpdateType, FilterType} from '../const.js';
-import CommentsModel from '../model/comments-model.js';
-import CommentsApiService from '../api/comments-api-service.js';
 
-const AUTHORIZATION = 'Basic ikf1Leyz2gj3gjkire4';
-const END_POINT = 'https://17.ecmascript.pages.academy/cinemaddict';
 const FILM_COUNT_PER_STEP = 5;
+
+const TimeLimit = {
+  LOWER_LIMIT: 350,
+  UPPER_LIMIT: 1000,
+};
 
 const body = document.querySelector('body');
 export default class FilmsPresenter {
   #filmsContainer = null;
   #filmsModel = null;
   #filterModel = null;
+  #commentsModel = null;
   #filmPopupComponent = null;
 
   #filmsComponent = new FilmsView();
@@ -41,13 +44,17 @@ export default class FilmsPresenter {
   #filterType = FilterType.ALL;
   #isLoading = true;
 
-  constructor(filmsContainer, filmsModel, filterModel) {
-    this.#filmsContainer = filmsContainer;
-    this.#filmsModel = filmsModel;
-    this.#filterModel = filterModel;
+  #uiBlocker = new UiBlocker(TimeLimit.LOWER_LIMIT, TimeLimit.UPPER_LIMIT);
 
-    this.#filmsModel.addObserver(this.#handleModelEvent);
+  constructor(filmsContainer, filterModel, filmsModel, commentsModel) {
+    this.#filmsContainer = filmsContainer;
+    this.#filterModel = filterModel;
+    this.#filmsModel = filmsModel;
+    this.#commentsModel = commentsModel;
+
     this.#filterModel.addObserver(this.#handleModelEvent);
+    this.#filmsModel.addObserver(this.#handleModelEvent);
+    this.#commentsModel.addObserver(this.#handleModelEvent);
   }
 
   get films() {
@@ -148,31 +155,26 @@ export default class FilmsPresenter {
     render(this.#showMoreButtonComponent, this.#filmsListComponent.element);
   };
 
-  #openFilmPopup = (film) => {
+  #openFilmPopup = async (film) => {
     this.#film = film;
-    const commentsModel = new CommentsModel(new CommentsApiService(END_POINT, AUTHORIZATION, this.#film.id));
 
-    commentsModel.init()
-      .finally(() => {
-        if (this.#filmPopupComponent) {
-          this.#closeFilmPopup();
-        }
+    if (this.#filmPopupComponent) {
+      this.#closeFilmPopup();
+    }
 
-        this.#film.comments = commentsModel.comments;
-        this.#filmPopupComponent = new FilmPopupView(this.#film);
-        this.#filmPopupComponent.setCloseClickHandler(this.#closeFilmPopup);
-        this.#filmPopupComponent.setWatchlistPopupClickHandler(this.#watchlistPopupClickHandler);
-        this.#filmPopupComponent.setWatchedPopupClickHandler(this.#watchedPopupClickHandler);
-        this.#filmPopupComponent.setFavoritePopupClickHandler(this.#favoritePopupClickHandler);
-        this.#filmPopupComponent.setFormSubmitHandler(this.#handleCommentAddHandler);
-        this.#filmPopupComponent.setDeleteClickHandler(this.#handleCommentDeleteHandler);
-        render(this.#filmPopupComponent, body);
+    const comments = await this.#commentsModel.getComments(film.id);
 
-        document.addEventListener('keydown', this.#handleKeyDown);
-        body.classList.add('hide-overflow');
+    this.#filmPopupComponent = new FilmPopupView(this.#film, comments);
+    this.#filmPopupComponent.setCloseClickHandler(this.#closeFilmPopup);
+    this.#filmPopupComponent.setWatchlistPopupClickHandler(this.#watchlistPopupClickHandler);
+    this.#filmPopupComponent.setWatchedPopupClickHandler(this.#watchedPopupClickHandler);
+    this.#filmPopupComponent.setFavoritePopupClickHandler(this.#favoritePopupClickHandler);
+    this.#filmPopupComponent.setAddSubmitHandler(this.#handleCommentAddHandler);
+    this.#filmPopupComponent.setDeleteClickHandler(this.#handleCommentDeleteHandler);
+    render(this.#filmPopupComponent, body);
 
-        this.#film.comments = this.#film.comments.map((el) => el.id);
-      });
+    document.addEventListener('keydown', this.#handleKeyDown);
+    body.classList.add('hide-overflow');
   };
 
   #closeFilmPopup = () => {
@@ -241,42 +243,86 @@ export default class FilmsPresenter {
     }
   };
 
-  #watchlistPopupClickHandler = () => {
-    const film = {...this.#film, watchlist: !this.#film.watchlist};
+  #watchlistPopupClickHandler = async (film) => {
+    this.#uiBlocker.block();
 
-    this.#filmsModel.updateFilm(UpdateType.MINOR, film);
-    this.#openFilmPopup(film);
+    try {
+      await this.#filmsModel.updateFilm(
+        UpdateType.MINOR,
+        {...film, watchlist: !film.watchlist},
+      );
+
+      this.#filmPopupComponent.updateElement({watchlist: !film.watchlist});
+    } catch(err) {
+      this.#filmPresenter.get(film.id).setPopupControlsAborting(this.#filmPopupComponent);
+    }
+
+    this.#uiBlocker.unblock();
   };
 
-  #watchedPopupClickHandler = () => {
-    const film = {...this.#film, watched: !this.#film.watched};
+  #watchedPopupClickHandler = async (film) => {
+    this.#uiBlocker.block();
 
-    this.#filmsModel.updateFilm(UpdateType.MINOR, film);
-    this.#openFilmPopup(film);
+    try {
+      await this.#filmsModel.updateFilm(
+        UpdateType.MINOR,
+        {...film, watched: !film.watched},
+      );
+
+      this.#filmPopupComponent.updateElement({watched: !film.watched});
+    } catch(err) {
+      this.#filmPresenter.get(film.id).setPopupControlsAborting(this.#filmPopupComponent);
+    }
+
+    this.#uiBlocker.unblock();
   };
 
-  #favoritePopupClickHandler = () => {
-    const film = {...this.#film, favorite: !this.#film.favorite};
+  #favoritePopupClickHandler = async (film) => {
+    this.#uiBlocker.block();
 
-    this.#filmsModel.updateFilm(UpdateType.MINOR, film);
-    this.#openFilmPopup(film);
+    try {
+      await this.#filmsModel.updateFilm(
+        UpdateType.MINOR,
+        {...film, favorite: !film.favorite},
+      );
+
+      this.#filmPopupComponent.updateElement({favorite: !film.favorite});
+    } catch(err) {
+      this.#filmPresenter.get(film.id).setPopupControlsAborting(this.#filmPopupComponent);
+    }
+
+    this.#uiBlocker.unblock();
   };
 
-  #handleCommentAddHandler = (film, comment) => {
-    const commentsModel = new CommentsModel(new CommentsApiService(END_POINT, AUTHORIZATION, this.#film.id));
-    film.comments.push(comment);
-    commentsModel.addComment(UpdateType.PATCH, comment, film);
-    this.#filmsModel.updateFilm(UpdateType.PATCH, film);
-    this.#openFilmPopup(film);
+  #handleCommentAddHandler = async (film, comment) => {
+    this.#uiBlocker.block();
+
+    try {
+      const newComments = await this.#commentsModel.addComment(UpdateType.PATCH, comment, film);
+      this.#filmPopupComponent.updateElementByComments(newComments, {comments: film.comments});
+    } catch(err) {
+      this.#filmPresenter.get(film.id).setAddAborting(this.#filmPopupComponent);
+    }
+
+    this.#uiBlocker.unblock();
   };
 
-  #handleCommentDeleteHandler = (film, comments, id) => {
-    const commentsModel = new CommentsModel(new CommentsApiService(END_POINT, AUTHORIZATION, this.#film.id));
-    const index = comments.findIndex((item) => String(item.id) === id);
+  #handleCommentDeleteHandler = async (film, id, target, comments) => {
+    this.#uiBlocker.block();
 
-    film.comments.splice(index, 1);
-    commentsModel.deleteComment(UpdateType.PATCH, index);
-    this.#filmsModel.updateFilm(UpdateType.PATCH, film);
-    this.#openFilmPopup(film);
+    target.setAttribute('disabled', 'disabled');
+    target.textContent = 'Deleting...';
+    const newComments = comments.filter((comment) => comment.id !== id);
+
+    try {
+      await this.#commentsModel.deleteComment(UpdateType.PATCH, id, film, comments);
+      this.#filmPopupComponent.updateElementByComments(newComments, {comments: film.comments});
+    } catch(err) {
+      target.textContent = 'Delete';
+      target.removeAttribute('disabled', 'disabled');
+      this.#filmPresenter.get(film.id).setDeleteAborting(this.#filmPopupComponent, target);
+    }
+
+    this.#uiBlocker.unblock();
   };
 }
