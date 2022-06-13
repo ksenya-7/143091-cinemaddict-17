@@ -207,18 +207,19 @@ export default class FilmPopupView extends AbstractStatefulView {
     }, SHAKE_ANIMATION_TIMEOUT);
   }
 
-  updateElementByComments = (updateComments) => {
+  updateElementByComments = (updateComments, update) => {
     if (!updateComments) {
       return;
     }
 
-    this._setStateComments(updateComments);
+    this._setStateComments(updateComments, update);
 
     this.#rerenderElementByComments();
   };
 
-  _setStateComments = (update) => {
-    this._comments = update;
+  _setStateComments = (updateComments, update) => {
+    this._comments = updateComments;
+    this._state = {...this._state, ...update};
   };
 
   #rerenderElementByComments = () => {

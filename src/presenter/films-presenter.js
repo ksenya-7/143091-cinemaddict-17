@@ -299,13 +299,10 @@ export default class FilmsPresenter {
 
     try {
       const newComments = await this.#commentsModel.addComment(UpdateType.PATCH, comment, film);
-      this.#filmPopupComponent.updateElement({comments: film.comments});
-      this.#filmPopupComponent.updateElementByComments(newComments);
+      this.#filmPopupComponent.updateElementByComments(newComments, {comments: film.comments});
     } catch(err) {
       this.#filmPresenter.get(film.id).setAddAborting(this.#filmPopupComponent);
     }
-
-    this.#film = film;
 
     this.#uiBlocker.unblock();
   };
@@ -315,11 +312,11 @@ export default class FilmsPresenter {
 
     target.setAttribute('disabled', 'disabled');
     target.textContent = 'Deleting...';
+    const newComments = comments.filter((comment) => comment.id !== id);
 
     try {
-      const newComments = await this.#commentsModel.deleteComment(UpdateType.PATCH, id, film, comments);
-      this.#filmPopupComponent.updateElement({comments: film.comments});
-      this.#filmPopupComponent.updateElementByComments(newComments);
+      await this.#commentsModel.deleteComment(UpdateType.PATCH, id, film, comments);
+      this.#filmPopupComponent.updateElementByComments(newComments, {comments: film.comments});
     } catch(err) {
       target.textContent = 'Delete';
       target.removeAttribute('disabled', 'disabled');
