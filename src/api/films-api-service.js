@@ -1,10 +1,5 @@
 import ApiService from '../framework/api-service.js';
 
-const Method = {
-  GET: 'GET',
-  PUT: 'PUT',
-};
-
 export default class FilmsApiService extends ApiService {
   get films() {
     return this._load({url: 'movies'})
@@ -14,7 +9,7 @@ export default class FilmsApiService extends ApiService {
   updateFilm = async (film) => {
     const response = await this._load({
       url: `movies/${film.id}`,
-      method: Method.PUT,
+      method: 'PUT',
       body: JSON.stringify(this.#adaptToServer(film)),
       headers: new Headers({'Content-Type': 'application/json'}),
     });

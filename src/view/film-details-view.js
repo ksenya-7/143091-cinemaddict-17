@@ -217,25 +217,6 @@ export default class FilmPopupView extends AbstractStatefulView {
     this.#rerenderElementByComments();
   };
 
-  _setStateComments = (updateComments, update) => {
-    this._comments = updateComments;
-    this._state = {...this._state, ...update};
-  };
-
-  #rerenderElementByComments = () => {
-    const prevElement = this.element;
-    const parent = prevElement.parentElement;
-    this.removeElement();
-    this._setState({
-      commentText: '',
-      commentEmotion: '',
-    });
-    const newElement = this.element;
-    parent.replaceChild(newElement, prevElement);
-
-    this._restoreHandlers();
-  };
-
   setCloseClickHandler = (callback) => {
     this._callback.closeClick = callback;
     this.element.querySelector('.film-details__close-btn').addEventListener('click', this.#closeClickHandler);
@@ -270,20 +251,9 @@ export default class FilmPopupView extends AbstractStatefulView {
     });
   };
 
-  #closeClickHandler = () => {
-    this._callback.closeClick();
-  };
-
-  #watchlistPopupClickHandler = () => {
-    this._callback.watchlistPopupClick(this._state);
-  };
-
-  #watchedPopupClickHandler = () => {
-    this._callback.watchedPopupClick(this._state);
-  };
-
-  #favoritePopupClickHandler = () => {
-    this._callback.favoritePopupClick(this._state);
+  _setStateComments = (updateComments, update) => {
+    this._comments = updateComments;
+    this._state = {...this._state, ...update};
   };
 
   _restoreHandlers = () => {
@@ -295,6 +265,39 @@ export default class FilmPopupView extends AbstractStatefulView {
     this.setAddSubmitHandler(this._callback.addSubmit);
     this.setDeleteClickHandler(this._callback.deleteClick);
     this.element.scrollTop = this._scrollTop;
+  };
+
+  #rerenderElementByComments = () => {
+    const prevElement = this.element;
+    const parent = prevElement.parentElement;
+    this.removeElement();
+    this._setState({
+      commentText: '',
+      commentEmotion: '',
+    });
+    const newElement = this.element;
+    parent.replaceChild(newElement, prevElement);
+
+    this._restoreHandlers();
+  };
+
+  #closeClickHandler = () => {
+    this._callback.closeClick();
+  };
+
+  #watchlistPopupClickHandler = () => {
+    this._scrollTop = this.element.scrollTop;
+    this._callback.watchlistPopupClick(this._state);
+  };
+
+  #watchedPopupClickHandler = () => {
+    this._scrollTop = this.element.scrollTop;
+    this._callback.watchedPopupClick(this._state);
+  };
+
+  #favoritePopupClickHandler = () => {
+    this._scrollTop = this.element.scrollTop;
+    this._callback.favoritePopupClick(this._state);
   };
 
   #emotionChangeHandler = (evt) => {
