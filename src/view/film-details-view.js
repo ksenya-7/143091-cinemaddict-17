@@ -207,6 +207,12 @@ export default class FilmPopupView extends AbstractStatefulView {
     }, SHAKE_ANIMATION_TIMEOUT);
   }
 
+  resetFormState = () => {
+    this.updateElement({
+      isDisabled: false,
+    });
+  };
+
   updateElementByComments = (updateComments, update) => {
     if (!updateComments) {
       return;

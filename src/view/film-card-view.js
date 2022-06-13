@@ -1,4 +1,4 @@
-import AbstractView from '../framework/view/abstract-view.js';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import {getTimeFromMins, humanizeFilmReleaseYear} from '../utils/film.js';
 
 const SHAKE_CLASS_NAME = 'shake';
@@ -39,7 +39,7 @@ const createFilmCardTemplate = (film) => {
   );
 };
 
-export default class FilmCardView extends AbstractView {
+export default class FilmCardView extends AbstractStatefulView {
   #film = null;
 
   constructor(film) {
@@ -81,6 +81,13 @@ export default class FilmCardView extends AbstractView {
   setFavoriteClickHandler = (callback) => {
     this._callback.favoriteClick = callback;
     this.element.querySelector('.film-card__controls-item--favorite').addEventListener('click', this.#favoriteClickHandler);
+  };
+
+  _restoreHandlers = () => {
+    this.setOpenClickHandler(this._callback.openClick);
+    this.setWatchlistClickHandler(this._callback.watchlistClick);
+    this.setWatchedClickHandler(this._callback.watchedClick);
+    this.setFavoriteClickHandler(this._callback.favoriteClick);
   };
 
   #openClickHandler = () => {
