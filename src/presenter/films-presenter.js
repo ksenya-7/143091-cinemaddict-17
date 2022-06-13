@@ -155,7 +155,7 @@ export default class FilmsPresenter {
     render(this.#showMoreButtonComponent, this.#filmsListComponent.element);
   };
 
-  #openFilmPopup = async (film, scrollTop) => {
+  #openFilmPopup = async (film) => {
     this.#film = film;
 
     if (this.#filmPopupComponent) {
@@ -175,10 +175,6 @@ export default class FilmsPresenter {
 
     document.addEventListener('keydown', this.#handleKeyDown);
     body.classList.add('hide-overflow');
-
-    if (scrollTop) {
-      this.#filmPopupComponent.element.scrollTop = scrollTop;
-    }
   };
 
   #closeFilmPopup = () => {
@@ -298,32 +294,32 @@ export default class FilmsPresenter {
     this.#uiBlocker.unblock();
   };
 
-  #handleCommentAddHandler = async (film, comment, scrollTop) => {
+  #handleCommentAddHandler = async (film, comment) => {
     this.#uiBlocker.block();
 
     try {
-      await this.#commentsModel.addComment(UpdateType.PATCH, comment, film);
-      this.#openFilmPopup(film, scrollTop);
+      const newComments = await this.#commentsModel.addComment(UpdateType.PATCH, comment, film);
+      this.#filmPopupComponent.updateElement({comments: film.comments});
+      this.#filmPopupComponent.updateElementByComments(newComments);
     } catch(err) {
       this.#filmPresenter.get(film.id).setAddAborting(this.#filmPopupComponent);
     }
 
+    this.#film = film;
+
     this.#uiBlocker.unblock();
   };
 
-  #handleCommentDeleteHandler = async (film, id, scrollTop, target) => {
+  #handleCommentDeleteHandler = async (film, id, target, comments) => {
     this.#uiBlocker.block();
 
-    const commentsById = await this.#commentsModel.getComments(film.id);
-    const comment = commentsById.find((item) => String(item.id) === id);
-    const index = commentsById.findIndex((item) => String(item.id) === id);
-    film.comments.splice(index, 1);
     target.setAttribute('disabled', 'disabled');
     target.textContent = 'Deleting...';
 
     try {
-      await this.#commentsModel.deleteComment(UpdateType.PATCH, comment, film);
-      this.#openFilmPopup(film, scrollTop);
+      const newComments = await this.#commentsModel.deleteComment(UpdateType.PATCH, id, film, comments);
+      this.#filmPopupComponent.updateElement({comments: film.comments});
+      this.#filmPopupComponent.updateElementByComments(newComments);
     } catch(err) {
       target.textContent = 'Delete';
       target.removeAttribute('disabled', 'disabled');

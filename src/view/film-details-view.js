@@ -173,6 +173,8 @@ const createFilmPopupTemplate = (film, comments) => {
 };
 
 export default class FilmPopupView extends AbstractStatefulView {
+  _scrollTop = 0;
+
   constructor(film, comments) {
     super();
 
@@ -187,10 +189,6 @@ export default class FilmPopupView extends AbstractStatefulView {
 
   get controls() {
     return this.element.querySelector('.film-details__controls');
-  }
-
-  get commentDeleteField() {
-    return this.element.querySelector('.film-details__new-comment');
   }
 
   shakeControls(callback) {
@@ -208,6 +206,34 @@ export default class FilmPopupView extends AbstractStatefulView {
       callback?.();
     }, SHAKE_ANIMATION_TIMEOUT);
   }
+
+  updateElementByComments = (updateComments) => {
+    if (!updateComments) {
+      return;
+    }
+
+    this._setStateComments(updateComments);
+
+    this.#rerenderElementByComments();
+  };
+
+  _setStateComments = (update) => {
+    this._comments = update;
+  };
+
+  #rerenderElementByComments = () => {
+    const prevElement = this.element;
+    const parent = prevElement.parentElement;
+    this.removeElement();
+    this._setState({
+      commentText: '',
+      commentEmotion: '',
+    });
+    const newElement = this.element;
+    parent.replaceChild(newElement, prevElement);
+
+    this._restoreHandlers();
+  };
 
   setCloseClickHandler = (callback) => {
     this._callback.closeClick = callback;
@@ -267,30 +293,31 @@ export default class FilmPopupView extends AbstractStatefulView {
     this.setFavoritePopupClickHandler(this._callback.favoritePopupClick);
     this.setAddSubmitHandler(this._callback.addSubmit);
     this.setDeleteClickHandler(this._callback.deleteClick);
+    this.element.scrollTop = this._scrollTop;
   };
 
   #emotionChangeHandler = (evt) => {
-    const scrollValue = this.element.scrollTop;
+    this._scrollTop = this.element.scrollTop;
     this.updateElement({
       commentEmotion: evt.target.value,
     });
-    this.element.scrollTop = scrollValue;
   };
 
   #commentInputHandler = (evt) => {
     evt.preventDefault();
+    this._scrollTop = this.element.scrollTop;
     this._setState({
       commentText: evt.target.value,
-      scrollTop: this.element.scrollTop,
     });
   };
 
   #commentAddSubmitHandler = (evt) => {
     if (evt.ctrlKey && evt.key === 'Enter') {
+      this._scrollTop = this.element.scrollTop;
       // this._setState({
       //   isDisabled: true,
       // });
-      this._callback.addSubmit(FilmPopupView.parseStateToFilm(this._state), FilmPopupView.newComment(this._state), this._state.scrollTop);
+      this._callback.addSubmit(FilmPopupView.parseStateToFilm(this._state), FilmPopupView.newComment(this._state));
     }
   };
 
@@ -298,11 +325,11 @@ export default class FilmPopupView extends AbstractStatefulView {
     evt.preventDefault();
     const idDelete = evt.target.dataset.buttonDelete;
     const target = evt.target;
-    this._setState({
-      scrollTop: this.element.scrollTop,
-      // isDisabled: true,
-    });
-    this._callback.deleteClick(FilmPopupView.parseStateToFilm(this._state), idDelete, this._state.scrollTop, target);
+    this._scrollTop = this.element.scrollTop;
+    // this._setState({
+    //   isDisabled: true,
+    // });
+    this._callback.deleteClick(FilmPopupView.parseStateToFilm(this._state), idDelete, target, this._comments);
   };
 
   #setInnerHandlers = () => {
@@ -314,7 +341,6 @@ export default class FilmPopupView extends AbstractStatefulView {
     {...film,
       commentText: '',
       commentEmotion: '',
-      scrollTop: '',
       isDisabled: false,
     }
   );
@@ -326,7 +352,6 @@ export default class FilmPopupView extends AbstractStatefulView {
 
     delete film.commentText;
     delete film.commentEmotion;
-    delete film.scrollTop;
     delete film.isDisabled;
 
     return film;
