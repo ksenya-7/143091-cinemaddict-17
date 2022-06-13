@@ -315,9 +315,9 @@ export default class FilmPopupView extends AbstractStatefulView {
   #commentAddSubmitHandler = (evt) => {
     if (evt.ctrlKey && evt.key === 'Enter') {
       this._scrollTop = this.element.scrollTop;
-      // this._setState({
-      //   isDisabled: true,
-      // });
+      this._setState({
+        isDisabled: true,
+      });
       this._callback.addSubmit(FilmPopupView.parseStateToFilm(this._state), FilmPopupView.newComment(this._state));
     }
   };
@@ -327,9 +327,9 @@ export default class FilmPopupView extends AbstractStatefulView {
     const idDelete = evt.target.dataset.buttonDelete;
     const target = evt.target;
     this._scrollTop = this.element.scrollTop;
-    // this._setState({
-    //   isDisabled: true,
-    // });
+    this._setState({
+      isDisabled: true,
+    });
     this._callback.deleteClick(FilmPopupView.parseStateToFilm(this._state), idDelete, target, this._comments);
   };
 
