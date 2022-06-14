@@ -13,9 +13,8 @@ const getHoursFromMins = (mins) => {
   const getHours = Math.trunc(mins/Time.HOUR);
   if (getHours === 1) {
     return 'hour';
-  } else {
-    return `${getHours} hours`;
   }
+  return `${getHours} hours`;
 };
 
 const getDaysFromMins = (mins) => {
@@ -30,18 +29,16 @@ const getMonthsFromMins = (mins) => {
   const getMonths = Math.trunc(mins/Time.MONTH);
   if (getMonths === 1) {
     return 'month';
-  } else {
-    return `${getMonths} months`;
   }
+  return `${getMonths} months`;
 };
 
 const getYearsFromMins = (mins) => {
   const getYears = Math.trunc(mins/Time.YEAR);
   if (getYears === 1) {
     return 'year';
-  } else {
-    return `${getYears} years`;
   }
+  return `${getYears} years`;
 };
 
 const getHumanizeCommentDate = (item) => {
@@ -63,9 +60,8 @@ const getHumanizeCommentDate = (item) => {
     return `A ${getDaysFromMins(diff)} ago`;
   } else if (diff >= Time.MONTH && diff < Time.YEAR) {
     return `A ${getMonthsFromMins(diff)} ago`;
-  } else {
-    return `A ${getYearsFromMins(diff)} ago`;
   }
+  return `A ${getYearsFromMins(diff)} ago`;
 };
 
 const getHumanizeFilmReleaseDate = (releaseDate) => dayjs(releaseDate).format('D MMMM YYYY');

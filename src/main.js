@@ -1,12 +1,12 @@
+import {render} from './framework/render.js';
 import ProfileButtonView from './view/profile-button-view.js';
 import StatisticsView from './view/statistics-view.js';
 import FilmsPresenter from './presenter/films-presenter.js';
 import FilterPresenter from './presenter/filter-presenter.js';
-import {render} from './framework/render.js';
 import FilmsModel from './model/films-model.js';
 import FilterModel from './model/filter-model.js';
-import FilmsApiService from './api/films-api-service.js';
 import CommentsModel from './model/comments-model.js';
+import FilmsApiService from './api/films-api-service.js';
 import CommentsApiService from './api/comments-api-service.js';
 
 const AUTHORIZATION = 'Basic ikf1Leyz2gj3gjkire4';

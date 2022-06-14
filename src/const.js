@@ -20,4 +20,9 @@ const UpdateType = {
   INIT: 'INIT',
 };
 
-export {EMOTIONS, FilterType, SortType, UpdateType};
+const TimeLimit = {
+  LOWER_LIMIT: 350,
+  UPPER_LIMIT: 1000,
+};
+
+export {EMOTIONS, FilterType, SortType, UpdateType, TimeLimit};

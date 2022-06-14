@@ -13,14 +13,9 @@ import SortView from '../view/sort-view.js';
 import FilmPresenter from './film-presenter.js';
 import {sortFilmByDate, sortFilmByRating, sortFilmByComments} from '../utils/film.js';
 import {filter} from '../utils/filter.js';
-import {SortType, UpdateType, FilterType} from '../const.js';
+import {SortType, UpdateType, FilterType, TimeLimit} from '../const.js';
 
 const FILM_COUNT_PER_STEP = 5;
-
-const TimeLimit = {
-  LOWER_LIMIT: 350,
-  UPPER_LIMIT: 1000,
-};
 
 const body = document.querySelector('body');
 
@@ -53,7 +48,6 @@ export default class FilmsPresenter {
   #filterType = FilterType.ALL;
   #isLoading = true;
   #uiBlocker = null;
-
 
   constructor(filmsContainer, filterModel, filmsModel, commentsModel) {
     this.#filmsContainer = filmsContainer;

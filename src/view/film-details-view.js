@@ -175,6 +175,22 @@ export default class FilmPopupView extends AbstractStatefulView {
     return this.element.querySelector('.film-details__controls');
   }
 
+  _setStateComments = (updateComments, update) => {
+    this._comments = updateComments;
+    this._state = {...this._state, ...update};
+  };
+
+  _restoreHandlers = () => {
+    this.#setInnerHandlers();
+    this.setCloseClickHandler(this._callback.closeClick);
+    this.setWatchlistPopupClickHandler(this._callback.watchlistPopupClick);
+    this.setWatchedPopupClickHandler(this._callback.watchedPopupClick);
+    this.setFavoritePopupClickHandler(this._callback.favoritePopupClick);
+    this.setAddSubmitHandler(this._callback.addSubmit);
+    this.setDeleteClickHandler(this._callback.deleteClick);
+    this.element.scrollTop = this._scrollTop;
+  };
+
   shakeControls(callback) {
     this.controls.classList.add(SHAKE_CLASS_NAME);
     setTimeout(() => {
@@ -239,22 +255,6 @@ export default class FilmPopupView extends AbstractStatefulView {
     deleteButtons.forEach((button) => {
       button.addEventListener('click', this.#commentDeleteClickHandler);
     });
-  };
-
-  _setStateComments = (updateComments, update) => {
-    this._comments = updateComments;
-    this._state = {...this._state, ...update};
-  };
-
-  _restoreHandlers = () => {
-    this.#setInnerHandlers();
-    this.setCloseClickHandler(this._callback.closeClick);
-    this.setWatchlistPopupClickHandler(this._callback.watchlistPopupClick);
-    this.setWatchedPopupClickHandler(this._callback.watchedPopupClick);
-    this.setFavoritePopupClickHandler(this._callback.favoritePopupClick);
-    this.setAddSubmitHandler(this._callback.addSubmit);
-    this.setDeleteClickHandler(this._callback.deleteClick);
-    this.element.scrollTop = this._scrollTop;
   };
 
   #rerenderElementByComments = () => {

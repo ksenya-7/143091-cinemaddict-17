@@ -1,12 +1,7 @@
 import {render, replace, remove} from '../framework/render.js';
 import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
+import {UpdateType, TimeLimit} from '../const.js';
 import FilmCardView from '../view/film-card-view.js';
-import {UpdateType} from '../const.js';
-
-const TimeLimit = {
-  LOWER_LIMIT: 350,
-  UPPER_LIMIT: 1000,
-};
 
 export default class FilmPresenter {
   #filmListContainer = null;

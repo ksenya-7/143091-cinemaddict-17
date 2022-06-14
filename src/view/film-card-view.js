@@ -57,6 +57,13 @@ export default class FilmCardView extends AbstractStatefulView {
     return this.element.querySelector('.film-card__controls');
   }
 
+  _restoreHandlers = () => {
+    this.setOpenClickHandler(this._callback.openClick);
+    this.setWatchlistClickHandler(this._callback.watchlistClick);
+    this.setWatchedClickHandler(this._callback.watchedClick);
+    this.setFavoriteClickHandler(this._callback.favoriteClick);
+  };
+
   shakeControls(callback) {
     this.controls.classList.add(SHAKE_CLASS_NAME);
     setTimeout(() => {
@@ -83,13 +90,6 @@ export default class FilmCardView extends AbstractStatefulView {
   setFavoriteClickHandler = (callback) => {
     this._callback.favoriteClick = callback;
     this.element.querySelector('.film-card__controls-item--favorite').addEventListener('click', this.#favoriteClickHandler);
-  };
-
-  _restoreHandlers = () => {
-    this.setOpenClickHandler(this._callback.openClick);
-    this.setWatchlistClickHandler(this._callback.watchlistClick);
-    this.setWatchedClickHandler(this._callback.watchedClick);
-    this.setFavoriteClickHandler(this._callback.favoriteClick);
   };
 
   #openClickHandler = () => {
