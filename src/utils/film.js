@@ -1,6 +1,32 @@
 import dayjs from 'dayjs';
 
 const getTimeFromMins = (mins) => (Math.trunc(mins/60) === 0) ? `${mins % 60}m` : `${Math.trunc(mins/60)}h ${mins % 60}m`;
+const getHoursFromMins = (mins) => {
+  const getHours = Math.trunc(mins/60);
+  if (getHours === 1) {
+    return `${getHours} hour`;
+  } else {
+    return `${getHours} hours`;
+  }
+};
+
+const getDaysFromMins = (mins) => {
+  const getDays = Math.trunc(mins/1440);
+  if (getDays === 1) {
+    return `${getDays} day`;
+  } else {
+    return `${getDays} days`;
+  }
+};
+
+const getYearsFromMins = (mins) => {
+  const getYears = Math.trunc(mins/525600);
+  if (getYears === 1) {
+    return `${getYears} year`;
+  } else {
+    return `${getYears} years`;
+  }
+};
 
 const humanizeFilmReleaseDate = (releaseDate) => dayjs(releaseDate).format('D MMMM YYYY');
 const humanizeFilmReleaseYear = (releaseDate) => dayjs(releaseDate).format('YYYY');
@@ -49,4 +75,4 @@ const sortFilmByRating = (filmA, filmB) => {
   return weight ?? filmB['film_info']['total_rating'] - filmA['film_info']['total_rating'];
 };
 
-export {getTimeFromMins, humanizeFilmReleaseDate, humanizeFilmReleaseYear, sortFilmByDate, sortFilmByRating};
+export {getTimeFromMins, humanizeFilmReleaseDate, humanizeFilmReleaseYear, sortFilmByDate, sortFilmByRating, getHoursFromMins, getDaysFromMins, getYearsFromMins};
