@@ -121,4 +121,14 @@ const sortFilmByComments = (filmA, filmB) => {
   return weight ?? filmB['comments'].length - filmA['comments'].length;
 };
 
-export {getTimeFromMins, humanizeFilmReleaseDate, humanizeFilmReleaseYear, sortFilmByDate, sortFilmByRating, getCommentDateDifference, sortFilmByComments};
+const cutText = (text) => {
+  const max = 140;
+
+  if (text.length >= max) {
+    text = `${Array.from(text).slice(0, 140).join('')}...`;
+  }
+
+  return text;
+};
+
+export {getTimeFromMins, humanizeFilmReleaseDate, humanizeFilmReleaseYear, sortFilmByDate, sortFilmByRating, getCommentDateDifference, sortFilmByComments, cutText};
