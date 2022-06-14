@@ -124,7 +124,7 @@ const sortFilmByComments = (filmA, filmB) => {
 const cutText = (text) => {
   const max = 140;
 
-  if (text.length >= max) {
+  if (text.length > max) {
     text = `${Array.from(text).slice(0, 139).join('')}...`;
   }
 
