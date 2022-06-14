@@ -44,7 +44,7 @@ const getYearsFromMins = (mins) => {
   }
 };
 
-const getCommentDateDifference = (item) => {
+const getHumanizeCommentDate = (item) => {
   const diff = dayjs().diff(item, 'minute');
 
   if (diff < 0) {
@@ -68,8 +68,8 @@ const getCommentDateDifference = (item) => {
   }
 };
 
-const humanizeFilmReleaseDate = (releaseDate) => dayjs(releaseDate).format('D MMMM YYYY');
-const humanizeFilmReleaseYear = (releaseDate) => dayjs(releaseDate).format('YYYY');
+const getHumanizeFilmReleaseDate = (releaseDate) => dayjs(releaseDate).format('D MMMM YYYY');
+const getHumanizeFilmReleaseYear = (releaseDate) => dayjs(releaseDate).format('YYYY');
 
 const getWeightForNullDate = (dateA, dateB) => {
   if (dateA === null && dateB === null) {
@@ -131,4 +131,4 @@ const cutText = (text) => {
   return text;
 };
 
-export {getTimeFromMins, humanizeFilmReleaseDate, humanizeFilmReleaseYear, sortFilmByDate, sortFilmByRating, getCommentDateDifference, sortFilmByComments, cutText};
+export {getTimeFromMins, getHumanizeFilmReleaseDate, getHumanizeFilmReleaseYear, sortFilmByDate, sortFilmByRating, getHumanizeCommentDate, sortFilmByComments, cutText};

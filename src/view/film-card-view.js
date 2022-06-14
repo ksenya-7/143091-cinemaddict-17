@@ -1,5 +1,5 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
-import {getTimeFromMins, humanizeFilmReleaseYear, cutText} from '../utils/film.js';
+import {getTimeFromMins, getHumanizeFilmReleaseYear, cutText} from '../utils/film.js';
 
 const SHAKE_CLASS_NAME = 'shake';
 const SHAKE_ANIMATION_TIMEOUT = 600;
@@ -9,7 +9,7 @@ const createFilmCardTemplate = (film) => {
 
   const filmInfo = film['film_info'];
   const releaseDate = filmInfo['release']['date'];
-  const year = humanizeFilmReleaseYear(releaseDate);
+  const year = getHumanizeFilmReleaseYear(releaseDate);
   const runtime = getTimeFromMins(filmInfo['runtime']);
 
   const watchlistClassName = film.watchlist ? 'film-card__controls-item--active' : '';

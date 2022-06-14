@@ -1,5 +1,5 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
-import {getTimeFromMins, humanizeFilmReleaseDate, getCommentDateDifference} from '../utils/film.js';
+import {getTimeFromMins, getHumanizeFilmReleaseDate, getHumanizeCommentDate} from '../utils/film.js';
 import {EMOTIONS} from '../const.js';
 import he from 'he';
 
@@ -17,7 +17,7 @@ const createGenresTemplate = (genres) => {
 };
 
 const createCommentsTemplate = (comments) => comments.map((comment) => {
-  const commentDate = getCommentDateDifference(comment.date);
+  const commentDate = getHumanizeCommentDate(comment.date);
 
   return (
     `<li class="film-details__comment">
@@ -48,7 +48,7 @@ const createFilmPopupTemplate = (film, comments) => {
   const filmInfo = film['film_info'];
 
   const releaseDate = filmInfo['release']['date'];
-  const releaseFullDate = humanizeFilmReleaseDate(releaseDate);
+  const releaseFullDate = getHumanizeFilmReleaseDate(releaseDate);
 
   const runtime = getTimeFromMins(filmInfo['runtime']);
 
