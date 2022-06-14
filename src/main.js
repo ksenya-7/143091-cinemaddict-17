@@ -27,7 +27,7 @@ const filmsPresenter = new FilmsPresenter(siteMainElement, filterModel, filmsMod
 filmsPresenter.init();
 filmsModel.init()
   .finally(() => {
-    render(new ProfileButtonView(filmsModel.films), siteHeaderElement);
     filterPresenter.init();
+    render(new ProfileButtonView(filmsModel.films), siteHeaderElement);
     render(new StatisticsView(filmsModel.films), siteFooterElement);
   });

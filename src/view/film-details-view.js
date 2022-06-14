@@ -1,36 +1,10 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
-import {getTimeFromMins, humanizeFilmReleaseDate, getHoursFromMins, getDaysFromMins, getYearsFromMins} from '../utils/film.js';
+import {getTimeFromMins, humanizeFilmReleaseDate, getCommentDateDifference} from '../utils/film.js';
 import {EMOTIONS} from '../const.js';
-import dayjs from 'dayjs';
 import he from 'he';
 
-const YEAR = 525600;
-const DAY = 1440;
-const HOUR = 60;
 const SHAKE_CLASS_NAME = 'shake';
 const SHAKE_ANIMATION_TIMEOUT = 600;
-
-const getCommentDateDiff = (item) => {
-  const diff = dayjs().diff(item, 'minute');
-
-  if (diff < 0) {
-    return 'No such time';
-  } else if (diff >= 0 && diff < 1) {
-    return 'Now';
-  } else if (diff >= 1 && diff < 2) {
-    return 'A minute ago';
-  } else if (diff >= 2 && diff < 10) {
-    return 'A few minutes ago';
-  } else if (diff >= 10 && diff < HOUR) {
-    return `A ${diff} minutes ago`;
-  } else if (diff >= HOUR && diff < DAY) {
-    return `A ${getHoursFromMins(diff)} ago`;
-  } else if (diff >= DAY && diff < YEAR) {
-    return `A ${getDaysFromMins(diff)} ago`;
-  } else {
-    return `A ${getYearsFromMins(diff)} ago`;
-  }
-};
 
 const createGenresTemplate = (genres) => {
   const createSpansTemplate = () => genres.map((element) => (`<span class="film-details__genre">${element}</span>`)).join('');
@@ -43,7 +17,7 @@ const createGenresTemplate = (genres) => {
 };
 
 const createCommentsTemplate = (comments) => comments.map((comment) => {
-  const commentDate = getCommentDateDiff(comment.date);
+  const commentDate = getCommentDateDifference(comment.date);
 
   return (
     `<li class="film-details__comment">
