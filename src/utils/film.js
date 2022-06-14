@@ -125,7 +125,7 @@ const cutText = (text) => {
   const max = 140;
 
   if (text.length >= max) {
-    text = `${Array.from(text).slice(0, 140).join('')}...`;
+    text = `${Array.from(text).slice(0, 139).join('')}...`;
   }
 
   return text;
