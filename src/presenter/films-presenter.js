@@ -1,9 +1,6 @@
 import {render, remove, RenderPosition} from '../framework/render.js';
 import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 import FilmsView from '../view/films-view.js';
-import FilmsListView from '../view/films-list-view.js';
-import FilmsListTopRatedView from '../view/films-list-top-rated-view.js';
-import FilmsListMostCommentedView from '../view/films-list-most-commented-view.js';
 import FilmsContainerView from '../view/films-container-view.js';
 import ShowMoreButtonView from '../view/show-more-button-view.js';
 import FilmsEmptyView from '../view/films-empty-view.js';
@@ -24,12 +21,10 @@ export default class FilmsPresenter {
   #filmsModel = null;
   #filterModel = null;
   #commentsModel = null;
+
   #filmPopupComponent = null;
 
   #filmsComponent = new FilmsView();
-  #filmsListComponent = new FilmsListView();
-  #filmsListTopRatedComponent = new FilmsListTopRatedView();
-  #filmsListMostCommentedComponent = new FilmsListMostCommentedView();
   #filmsContainerComponent = new FilmsContainerView();
   #filmsContainerTopRatedComponent = new FilmsContainerView();
   #filmsContainerMostCommentedComponent = new FilmsContainerView();
@@ -119,7 +114,7 @@ export default class FilmsPresenter {
     this.#sortComponent = new SortView(this.#currentSortType);
 
     this.#sortComponent.setSortTypeChangeHandler(this.#handleSortTypeChange);
-    render(this.#sortComponent, this.#filmsListComponent.element, RenderPosition.AFTERBEGIN);
+    render(this.#sortComponent, this.#filmsComponent.mainListElement, RenderPosition.AFTERBEGIN);
   };
 
   #handleSortTypeChange = (sortType) => {
@@ -179,7 +174,7 @@ export default class FilmsPresenter {
     this.#showMoreButtonComponent = new ShowMoreButtonView();
 
     this.#showMoreButtonComponent.setClickHandler(this.#handleShowMoreButtonClick);
-    render(this.#showMoreButtonComponent, this.#filmsListComponent.element);
+    render(this.#showMoreButtonComponent, this.#filmsComponent.mainListElement);
   };
 
   #openFilmPopup = async (film) => {
@@ -267,20 +262,17 @@ export default class FilmsPresenter {
 
     this.#renderSort();
 
-    render(this.#filmsListComponent, this.#filmsComponent.element);
-    render(this.#filmsContainerComponent, this.#filmsListComponent.element);
+    render(this.#filmsContainerComponent, this.#filmsComponent.mainListElement);
     this.#renderFilms(this.films.slice(0, Math.min(filmCount, this.#renderedFilmCount)));
 
     if (filmCount > this.#renderedFilmCount) {
       this.#renderShowMoreButton();
     }
 
-    render(this.#filmsListTopRatedComponent, this.#filmsComponent.element);
-    render(this.#filmsContainerTopRatedComponent, this.#filmsListTopRatedComponent.element);
+    render(this.#filmsContainerTopRatedComponent, this.#filmsComponent.topRatedListElement);
     this.#renderTopRatedFilms(this.films.sort(sortFilmByRating).slice(0, 2));
 
-    render(this.#filmsListMostCommentedComponent, this.#filmsComponent.element);
-    render(this.#filmsContainerMostCommentedComponent, this.#filmsListMostCommentedComponent.element);
+    render(this.#filmsContainerMostCommentedComponent, this.#filmsComponent.mostCommentedListElement);
     this.#renderMostCommentedFilms(this.films.sort(sortFilmByComments).slice(0, 2));
   };
 
