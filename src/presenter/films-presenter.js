@@ -340,7 +340,7 @@ export default class FilmsPresenter {
 
     try {
       const newComments = await this.#commentsModel.addComment(UpdateType.PATCH, comment, film);
-      await this.#filmsModel.updateFilm(UpdateType.MAJOR, {...film});
+      await this.#filmsModel.updateFilm(UpdateType.MINOR, {...film});
       this.#filmPopupComponent.updateElementByComments(newComments, {comments: film.comments});
     } catch(err) {
       this.#filmPresenter.get(film.id).setAddAborting(this.#filmPopupComponent);
@@ -358,7 +358,7 @@ export default class FilmsPresenter {
 
     try {
       await this.#commentsModel.deleteComment(UpdateType.PATCH, id, film, comments);
-      await this.#filmsModel.updateFilm(UpdateType.MAJOR, {...film});
+      await this.#filmsModel.updateFilm(UpdateType.MINOR, {...film});
       this.#filmPopupComponent.updateElementByComments(newComments, {comments: film.comments});
     } catch(err) {
       target.textContent = 'Delete';
