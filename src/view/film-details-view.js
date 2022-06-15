@@ -1,26 +1,10 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
-import {getTimeFromMins, humanizeFilmReleaseDate} from '../utils/film.js';
+import {getTimeFromMins, getHumanizeFilmReleaseDate, getHumanizeCommentDate} from '../utils/film.js';
 import {EMOTIONS} from '../const.js';
-import dayjs from 'dayjs';
 import he from 'he';
 
-const MONTH = 31;
 const SHAKE_CLASS_NAME = 'shake';
 const SHAKE_ANIMATION_TIMEOUT = 600;
-
-const commentDateDiff = (item) => {
-  const diff = dayjs().diff(item, 'day');
-
-  if (item.includes('day') || diff > MONTH) {
-    return item;
-  } else if (diff === 0) {
-    return 'Today';
-  } else if (diff === 1) {
-    return 'A day ago';
-  } else {
-    return `A ${diff} days ago`;
-  }
-};
 
 const createGenresTemplate = (genres) => {
   const createSpansTemplate = () => genres.map((element) => (`<span class="film-details__genre">${element}</span>`)).join('');
@@ -33,7 +17,7 @@ const createGenresTemplate = (genres) => {
 };
 
 const createCommentsTemplate = (comments) => comments.map((comment) => {
-  const commentDate = commentDateDiff(comment.date);
+  const commentDate = getHumanizeCommentDate(comment.date);
 
   return (
     `<li class="film-details__comment">
@@ -64,7 +48,7 @@ const createFilmPopupTemplate = (film, comments) => {
   const filmInfo = film['film_info'];
 
   const releaseDate = filmInfo['release']['date'];
-  const releaseFullDate = humanizeFilmReleaseDate(releaseDate);
+  const releaseFullDate = getHumanizeFilmReleaseDate(releaseDate);
 
   const runtime = getTimeFromMins(filmInfo['runtime']);
 
@@ -191,6 +175,22 @@ export default class FilmPopupView extends AbstractStatefulView {
     return this.element.querySelector('.film-details__controls');
   }
 
+  _setStateComments = (updateComments, update) => {
+    this._comments = updateComments;
+    this._state = {...this._state, ...update};
+  };
+
+  _restoreHandlers = () => {
+    this.#setInnerHandlers();
+    this.setCloseClickHandler(this._callback.closeClick);
+    this.setWatchlistPopupClickHandler(this._callback.watchlistPopupClick);
+    this.setWatchedPopupClickHandler(this._callback.watchedPopupClick);
+    this.setFavoritePopupClickHandler(this._callback.favoritePopupClick);
+    this.setAddSubmitHandler(this._callback.addSubmit);
+    this.setDeleteClickHandler(this._callback.deleteClick);
+    this.element.scrollTop = this._scrollTop;
+  };
+
   shakeControls(callback) {
     this.controls.classList.add(SHAKE_CLASS_NAME);
     setTimeout(() => {
@@ -206,6 +206,12 @@ export default class FilmPopupView extends AbstractStatefulView {
       callback?.();
     }, SHAKE_ANIMATION_TIMEOUT);
   }
+
+  resetFormState = () => {
+    this.updateElement({
+      isDisabled: false,
+    });
+  };
 
   updateElementByComments = (updateComments, update) => {
     if (!updateComments) {
@@ -249,22 +255,6 @@ export default class FilmPopupView extends AbstractStatefulView {
     deleteButtons.forEach((button) => {
       button.addEventListener('click', this.#commentDeleteClickHandler);
     });
-  };
-
-  _setStateComments = (updateComments, update) => {
-    this._comments = updateComments;
-    this._state = {...this._state, ...update};
-  };
-
-  _restoreHandlers = () => {
-    this.#setInnerHandlers();
-    this.setCloseClickHandler(this._callback.closeClick);
-    this.setWatchlistPopupClickHandler(this._callback.watchlistPopupClick);
-    this.setWatchedPopupClickHandler(this._callback.watchedPopupClick);
-    this.setFavoritePopupClickHandler(this._callback.favoritePopupClick);
-    this.setAddSubmitHandler(this._callback.addSubmit);
-    this.setDeleteClickHandler(this._callback.deleteClick);
-    this.element.scrollTop = this._scrollTop;
   };
 
   #rerenderElementByComments = () => {

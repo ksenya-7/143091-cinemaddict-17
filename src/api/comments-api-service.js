@@ -6,10 +6,6 @@ const Method = {
 };
 
 export default class CommentsApiService extends ApiService {
-  constructor(endPoint, authorization) {
-    super(endPoint, authorization);
-  }
-
   getComments = async (filmId) => this._load({url: `comments/${filmId}`})
     .then(ApiService.parseResponse);
 

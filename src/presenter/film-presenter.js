@@ -1,27 +1,23 @@
 import {render, replace, remove} from '../framework/render.js';
 import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
+import {UpdateType, TimeLimit} from '../const.js';
 import FilmCardView from '../view/film-card-view.js';
-import {UpdateType} from '../const.js';
-
-const TimeLimit = {
-  LOWER_LIMIT: 350,
-  UPPER_LIMIT: 1000,
-};
 
 export default class FilmPresenter {
   #filmListContainer = null;
   #openFilmPopup = null;
-  #filmComponent = null;
+  #filmsModel = null;
+  #uiBlocker = null;
 
   #film = null;
-  #filmsModel = null;
-
-  #uiBlocker = new UiBlocker(TimeLimit.LOWER_LIMIT, TimeLimit.UPPER_LIMIT);
+  #filmComponent = null;
 
   constructor(filmListContainer, openFilmPopup, filmsModel) {
     this.#filmListContainer = filmListContainer;
     this.#openFilmPopup = openFilmPopup;
     this.#filmsModel = filmsModel;
+
+    this.#uiBlocker = new UiBlocker(TimeLimit.LOWER_LIMIT, TimeLimit.UPPER_LIMIT);
   }
 
   init = (film) => {
@@ -56,44 +52,25 @@ export default class FilmPresenter {
   };
 
   setControlsAborting = () => {
-    const resetFormState = () => {
+    this.#filmComponent.shakeControls(() => {
       this.#filmComponent.updateElement({
         isDisabled: false,
       });
-    };
-
-    this.#filmComponent.shakeControls(resetFormState);
+    });
   };
 
   setPopupControlsAborting = (popupComponent) => {
-    const resetFormState = () => {
-      popupComponent.updateElement({
-        isDisabled: false,
-      });
-    };
-
-    popupComponent.shakeControls(resetFormState);
+    popupComponent.shakeControls(popupComponent.resetFormState);
   };
 
   setAddAborting = (popupComponent) => {
-    const resetFormState = () => {
-      popupComponent.updateElement({
-        isDisabled: false,
-      });
-    };
-
-    popupComponent.shake(resetFormState);
+    popupComponent.shake(popupComponent.resetFormState);
   };
 
   setDeleteAborting = (popupComponent, target) => {
-    const resetFormState = () => {
-      popupComponent.updateElement({
-        isDisabled: false,
-      });
-    };
     const parentBlock = target.closest('.film-details__comment');
 
-    popupComponent.shakeCommentDelete(resetFormState, parentBlock);
+    popupComponent.shakeCommentDelete(popupComponent.resetFormState, parentBlock);
   };
 
   #handleWatchlistClick = async () => {

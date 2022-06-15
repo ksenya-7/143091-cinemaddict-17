@@ -1,5 +1,5 @@
-import AbstractView from '../framework/view/abstract-view.js';
-import {getTimeFromMins, humanizeFilmReleaseYear} from '../utils/film.js';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
+import {getTimeFromMins, getHumanizeFilmReleaseYear, cutText} from '../utils/film.js';
 
 const SHAKE_CLASS_NAME = 'shake';
 const SHAKE_ANIMATION_TIMEOUT = 600;
@@ -9,12 +9,14 @@ const createFilmCardTemplate = (film) => {
 
   const filmInfo = film['film_info'];
   const releaseDate = filmInfo['release']['date'];
-  const year = humanizeFilmReleaseYear(releaseDate);
+  const year = getHumanizeFilmReleaseYear(releaseDate);
   const runtime = getTimeFromMins(filmInfo['runtime']);
 
   const watchlistClassName = film.watchlist ? 'film-card__controls-item--active' : '';
   const watchedClassName = film.watched ? 'film-card__controls-item--active' : '';
   const favoriteClassName = film.favorite ? 'film-card__controls-item--active' : '';
+
+  const description = cutText(filmInfo['description']);
 
   return (
     `<article class="film-card">
@@ -27,7 +29,7 @@ const createFilmCardTemplate = (film) => {
           <span class="film-card__genre">${genre[0]}</span>
         </p>
         <img src="./${filmInfo['poster']}" alt="" class="film-card__poster">
-        <p class="film-card__description">${filmInfo['description']}</p>
+        <p class="film-card__description">${description}</p>
         <span class="film-card__comments">${film['comments'].length} comments</span>
       </a>
       <div class="film-card__controls">
@@ -39,7 +41,7 @@ const createFilmCardTemplate = (film) => {
   );
 };
 
-export default class FilmCardView extends AbstractView {
+export default class FilmCardView extends AbstractStatefulView {
   #film = null;
 
   constructor(film) {
@@ -54,6 +56,13 @@ export default class FilmCardView extends AbstractView {
   get controls() {
     return this.element.querySelector('.film-card__controls');
   }
+
+  _restoreHandlers = () => {
+    this.setOpenClickHandler(this._callback.openClick);
+    this.setWatchlistClickHandler(this._callback.watchlistClick);
+    this.setWatchedClickHandler(this._callback.watchedClick);
+    this.setFavoriteClickHandler(this._callback.favoriteClick);
+  };
 
   shakeControls(callback) {
     this.controls.classList.add(SHAKE_CLASS_NAME);
