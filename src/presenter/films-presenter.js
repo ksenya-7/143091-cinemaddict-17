@@ -1,7 +1,6 @@
 import {render, remove, RenderPosition} from '../framework/render.js';
 import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 import FilmsView from '../view/films-view.js';
-import FilmsContainerView from '../view/films-container-view.js';
 import ShowMoreButtonView from '../view/show-more-button-view.js';
 import FilmsEmptyView from '../view/films-empty-view.js';
 import LoadingView from '../view/loading-view.js';
@@ -25,9 +24,6 @@ export default class FilmsPresenter {
   #filmPopupComponent = null;
 
   #filmsComponent = new FilmsView();
-  #filmsContainerComponent = new FilmsContainerView();
-  #filmsContainerTopRatedComponent = new FilmsContainerView();
-  #filmsContainerMostCommentedComponent = new FilmsContainerView();
   #loadingComponent = new LoadingView();
   #noFilmComponent = null;
   #sortComponent = null;
@@ -114,7 +110,7 @@ export default class FilmsPresenter {
     this.#sortComponent = new SortView(this.#currentSortType);
 
     this.#sortComponent.setSortTypeChangeHandler(this.#handleSortTypeChange);
-    render(this.#sortComponent, this.#filmsComponent.mainListElement, RenderPosition.AFTERBEGIN);
+    render(this.#sortComponent, this.#filmsComponent.element, RenderPosition.BEFOREBEGIN);
   };
 
   #handleSortTypeChange = (sortType) => {
@@ -129,7 +125,7 @@ export default class FilmsPresenter {
   };
 
   #renderFilm = (film) => {
-    const filmPresenter = new FilmPresenter(this.#filmsContainerComponent.element, this.#openFilmPopup, this.#filmsModel);
+    const filmPresenter = new FilmPresenter(this.#filmsComponent.mainListElement, this.#openFilmPopup, this.#filmsModel);
 
     filmPresenter.init(film);
     this.#filmPresenter.set(film.id, filmPresenter);
@@ -140,7 +136,7 @@ export default class FilmsPresenter {
   };
 
   #renderTopRatedFilm = (film) => {
-    const filmTopRatedPresenter = new FilmPresenter(this.#filmsContainerTopRatedComponent.element, this.#openFilmPopup, this.#filmsModel);
+    const filmTopRatedPresenter = new FilmPresenter(this.#filmsComponent.topRatedListElement, this.#openFilmPopup, this.#filmsModel);
 
     filmTopRatedPresenter.init(film);
     this.#filmTopRatedPresenter.set(film.id, filmTopRatedPresenter);
@@ -151,7 +147,7 @@ export default class FilmsPresenter {
   };
 
   #renderMostCommentedFilm = (film) => {
-    const filmMostCommentedPresenter = new FilmPresenter(this.#filmsContainerMostCommentedComponent.element, this.#openFilmPopup, this.#filmsModel);
+    const filmMostCommentedPresenter = new FilmPresenter(this.#filmsComponent.mostCommentedListElement, this.#openFilmPopup, this.#filmsModel);
 
     filmMostCommentedPresenter.init(film);
     this.#filmMostCommentedPresenter.set(film.id, filmMostCommentedPresenter);
@@ -262,17 +258,14 @@ export default class FilmsPresenter {
 
     this.#renderSort();
 
-    render(this.#filmsContainerComponent, this.#filmsComponent.mainListElement);
     this.#renderFilms(this.films.slice(0, Math.min(filmCount, this.#renderedFilmCount)));
 
     if (filmCount > this.#renderedFilmCount) {
       this.#renderShowMoreButton();
     }
 
-    render(this.#filmsContainerTopRatedComponent, this.#filmsComponent.topRatedListElement);
     this.#renderTopRatedFilms(this.films.sort(sortFilmByRating).slice(0, 2));
 
-    render(this.#filmsContainerMostCommentedComponent, this.#filmsComponent.mostCommentedListElement);
     this.#renderMostCommentedFilms(this.films.sort(sortFilmByComments).slice(0, 2));
   };
 
