@@ -1,5 +1,7 @@
 import dayjs from 'dayjs';
 
+const MAX_TEXT_LENGTH = 140;
+
 const Time = {
   HOUR: 60,
   DAY: 1440,
@@ -67,64 +69,7 @@ const getHumanizeCommentDate = (item) => {
 const getHumanizeFilmReleaseDate = (releaseDate) => dayjs(releaseDate).format('D MMMM YYYY');
 const getHumanizeFilmReleaseYear = (releaseDate) => dayjs(releaseDate).format('YYYY');
 
-const getWeightForNullDate = (dateA, dateB) => {
-  if (dateA === null && dateB === null) {
-    return 0;
-  }
+const getСroppedText = (text) => text.length > MAX_TEXT_LENGTH ? `${Array.from(text).slice(0, 139).join('')}...` : text;
 
-  if (dateA === null) {
-    return 1;
-  }
 
-  if (dateB === null) {
-    return -1;
-  }
-
-  return null;
-};
-
-const getWeightForNullRating = (ratingA, ratingB) => {
-  if (ratingA === null && ratingB === null) {
-    return 0;
-  }
-
-  if (ratingA === null) {
-    return 1;
-  }
-
-  if (ratingB === null) {
-    return -1;
-  }
-
-  return null;
-};
-
-const sortFilmByDate = (filmA, filmB) => {
-  const weight = getWeightForNullRating(filmA['film_info']['release']['date'], filmB['film_info']['release']['date']);
-
-  return weight ?? dayjs(filmB['film_info']['release']['date']).diff(dayjs(filmA['film_info']['release']['date']));
-};
-
-const sortFilmByRating = (filmA, filmB) => {
-  const weight = getWeightForNullDate(filmA['film_info']['total_rating'], filmB['film_info']['total_rating']);
-
-  return weight ?? filmB['film_info']['total_rating'] - filmA['film_info']['total_rating'];
-};
-
-const sortFilmByComments = (filmA, filmB) => {
-  const weight = getWeightForNullDate(filmA['comments'].length, filmB['comments'].length);
-
-  return weight ?? filmB['comments'].length - filmA['comments'].length;
-};
-
-const cutText = (text) => {
-  const max = 140;
-
-  if (text.length > max) {
-    text = `${Array.from(text).slice(0, 139).join('')}...`;
-  }
-
-  return text;
-};
-
-export {getTimeFromMins, getHumanizeFilmReleaseDate, getHumanizeFilmReleaseYear, sortFilmByDate, sortFilmByRating, getHumanizeCommentDate, sortFilmByComments, cutText};
+export {getTimeFromMins, getHumanizeFilmReleaseDate, getHumanizeFilmReleaseYear, getHumanizeCommentDate, getСroppedText};

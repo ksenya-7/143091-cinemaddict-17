@@ -7,4 +7,5 @@ const filter = {
   [FilterType.FAVORITES]: (films) => films.filter((film) => film.favorite),
 };
 
+
 export {filter};

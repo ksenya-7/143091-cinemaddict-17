@@ -1,5 +1,5 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
-import {getTimeFromMins, getHumanizeFilmReleaseYear, cutText} from '../utils/film.js';
+import {getTimeFromMins, getHumanizeFilmReleaseYear, getСroppedText} from '../utils/film.js';
 
 const SHAKE_CLASS_NAME = 'shake';
 const SHAKE_ANIMATION_TIMEOUT = 600;
@@ -16,7 +16,7 @@ const createFilmCardTemplate = (film) => {
   const watchedClassName = film.watched ? 'film-card__controls-item--active' : '';
   const favoriteClassName = film.favorite ? 'film-card__controls-item--active' : '';
 
-  const description = cutText(filmInfo['description']);
+  const description = getСroppedText(filmInfo['description']);
 
   return (
     `<article class="film-card">
