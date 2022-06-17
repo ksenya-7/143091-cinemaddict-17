@@ -6,42 +6,6 @@ import he from 'he';
 const SHAKE_CLASS_NAME = 'shake';
 const SHAKE_ANIMATION_TIMEOUT = 600;
 
-const createGenresTemplate = (genres) => {
-  const createSpansTemplate = () => genres.map((element) => (`<span class="film-details__genre">${element}</span>`)).join('');
-  return (
-    `<td class="film-details__term">${genres.length === 1 ? 'Genre' : 'Genres'}</td>
-      <td class="film-details__cell">
-        ${createSpansTemplate()}
-    `
-  );
-};
-
-const createCommentsTemplate = (comments) => comments.map((comment) => {
-  const commentDate = getHumanizeCommentDate(comment.date);
-
-  return (
-    `<li class="film-details__comment">
-      <span class="film-details__comment-emoji">
-        ${comment.emotion ? `<img src="./images/emoji/${comment.emotion}.png" width="55" height="55" alt="emoji-${comment.emotion}">` : ''}
-      </span>
-      <div>
-        <p class="film-details__comment-text">${comment.comment}</p>
-        <p class="film-details__comment-info">
-          <span class="film-details__comment-author">${comment.author}</span>
-          <span class="film-details__comment-day">${commentDate}</span>
-          <button class="film-details__comment-delete" data-button-delete="${comment.id}">Delete</button>
-        </p>
-      </div>
-    </li>`);
-}).join('');
-
-const createEmotionsTemplate = (isDisabled) => EMOTIONS.map((el) => (
-  `<input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${el}" value="${el}" ${isDisabled ? 'disabled' : ''}>
-    <label class="film-details__emoji-label" for="emoji-${el}">
-      <img src="./images/emoji/${el}.png" width="30" height="30" alt="emoji-${el}">
-    </label>`)).join('');
-
-
 const createFilmPopupTemplate = (film, comments) => {
   const {isDisabled} = film;
 
@@ -52,14 +16,9 @@ const createFilmPopupTemplate = (film, comments) => {
 
   const runtime = getTimeFromMins(filmInfo['runtime']);
 
-  const genresTemplate = createGenresTemplate(film.genre);
-  const commentsTemplate = createCommentsTemplate(comments);
-
   const watchlistClassName = film.watchlist ? 'film-details__control-button--active' : '';
   const watchedClassName = film.watched ? 'film-details__control-button--active' : '';
   const favoriteClassName = film.favorite ? 'film-details__control-button--active' : '';
-
-  const emotionsTemplate = createEmotionsTemplate(isDisabled);
 
   return (
     `<section class="film-details">
@@ -113,7 +72,10 @@ const createFilmPopupTemplate = (film, comments) => {
                   <td class="film-details__cell">${filmInfo['release']['release_country']}</td>
                 </tr>
                 <tr class="film-details__row">
-                  ${genresTemplate}
+                  <td class="film-details__term">${film.genre.length === 1 ? 'Genre' : 'Genres'}</td>
+                  <td class="film-details__cell">
+                    ${film.genre.map((element) => (`<span class="film-details__genre">${element}</span>`)).join('')}
+                  </td>
                 </tr>
               </table>
 
@@ -134,7 +96,18 @@ const createFilmPopupTemplate = (film, comments) => {
           <section class="film-details__comments-wrap">
             <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
             <ul class="film-details__comments-list">
-              ${commentsTemplate}
+              ${comments.map((comment) => (`<li class="film-details__comment">
+                <span class="film-details__comment-emoji">
+                  ${comment.emotion ? `<img src="./images/emoji/${comment.emotion}.png" width="55" height="55" alt="emoji-${comment.emotion}">` : ''}
+                </span>
+                <div>
+                  <p class="film-details__comment-text">${comment.comment}</p>
+                  <p class="film-details__comment-info">
+                    <span class="film-details__comment-author">${comment.author}</span>
+                    <span class="film-details__comment-day">${getHumanizeCommentDate(comment.date)}</span>
+                    <button class="film-details__comment-delete" data-button-delete="${comment.id}">Delete</button>
+                  </p>
+                </div></li>`)).join('')}
 
             </ul>
             <div class="film-details__new-comment">
@@ -146,7 +119,10 @@ const createFilmPopupTemplate = (film, comments) => {
               </label>
 
               <div class="film-details__emoji-list">
-                ${emotionsTemplate}
+                ${EMOTIONS.map((el) => (`<input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${el}" value="${el}" ${isDisabled ? 'disabled' : ''}>
+                    <label class="film-details__emoji-label" for="emoji-${el}">
+                      <img src="./images/emoji/${el}.png" width="30" height="30" alt="emoji-${el}">
+                    </label>`)).join('')}
               </div>
             </div>
           </section>
@@ -155,6 +131,7 @@ const createFilmPopupTemplate = (film, comments) => {
     </section>`
   );
 };
+
 
 export default class FilmPopupView extends AbstractStatefulView {
   _scrollTop = 0;

@@ -7,13 +7,14 @@ import LoadingView from '../view/loading-view.js';
 import FilmPopupView from '../view/film-details-view.js';
 import SortView from '../view/sort-view.js';
 import FilmPresenter from './film-presenter.js';
-import {sortFilmByDate, sortFilmByRating, sortFilmByComments} from '../utils/film.js';
+import {sortFilmByDate, sortFilmByRating, sortFilmByComments} from '../utils/sorting.js';
 import {filter} from '../utils/filter.js';
 import {SortType, UpdateType, FilterType, TimeLimit} from '../const.js';
 
 const FILM_COUNT_PER_STEP = 5;
 
 const body = document.querySelector('body');
+
 
 export default class FilmsPresenter {
   #filmsContainer = null;
@@ -170,7 +171,7 @@ export default class FilmsPresenter {
     this.#showMoreButtonComponent = new ShowMoreButtonView();
 
     this.#showMoreButtonComponent.setClickHandler(this.#handleShowMoreButtonClick);
-    render(this.#showMoreButtonComponent, this.#filmsComponent.mainListElement);
+    render(this.#showMoreButtonComponent, this.#filmsComponent.mainListElement, RenderPosition.AFTEREND);
   };
 
   #openFilmPopup = async (film) => {

@@ -1,15 +1,5 @@
 import AbstractView from '../framework/view/abstract-view.js';
-
-const getProfileRating = (item) => {
-  if (item > 21) {
-    return 'Movie Buff';
-  } else if (item >= 11 || item <= 20) {
-    return 'fan';
-  } else if (item >= 1 || item <= 10) {
-    return 'novice';
-  }
-  return '';
-};
+import {getProfileRating} from '../utils/common.js';
 
 const createProfileButtonTemplate = (count) => {
   const profile = getProfileRating(count);

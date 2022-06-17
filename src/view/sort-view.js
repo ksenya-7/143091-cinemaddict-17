@@ -8,6 +8,7 @@ const createSortTemplate = (currentSortType) => (
       <li><a href="#" class="sort__button ${currentSortType === SortType.RATING ? 'sort__button--active' : ''}" data-sort-type="${SortType.RATING}">Sort by rating</a></li>
     </ul>`
 );
+
 export default class SortView extends AbstractView {
   #currentSortType = null;
 
