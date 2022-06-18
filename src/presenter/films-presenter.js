@@ -123,6 +123,16 @@ export default class FilmsPresenter {
     render(this.#sortComponent, this.#filmsComponent.element, RenderPosition.BEFOREBEGIN);
   };
 
+  #renderProfileButton = () => {
+    if (this.countWatchedFilms === 0) {
+      return;
+    }
+
+    this.#profileButtonView = new ProfileButtonView(this.countWatchedFilms);
+
+    render(this.#profileButtonView, siteHeaderElement);
+  };
+
   #handleSortTypeChange = (sortType) => {
     if (this.#currentSortType === sortType) {
       return;
@@ -250,7 +260,6 @@ export default class FilmsPresenter {
 
   #renderBoard = () => {
     const filmCount = this.films.length;
-    this.#profileButtonView = new ProfileButtonView(this.countWatchedFilms);
 
     render(this.#filmsComponent, siteMainElement);
 
@@ -265,8 +274,8 @@ export default class FilmsPresenter {
       return;
     }
 
+    this.#renderProfileButton();
     this.#renderSort();
-    render(this.#profileButtonView, siteHeaderElement);
 
     this.#renderFilms(this.films.slice(0, Math.min(filmCount, this.#renderedFilmCount)));
 

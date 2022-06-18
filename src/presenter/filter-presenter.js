@@ -50,12 +50,6 @@ export default class FilterPresenter {
     ];
   }
 
-  // get countWatchedFilms() {
-  //   const films = this.#filmsModel.films;
-
-  //   return filterFilms[FilterType.HISTORY](films).length;
-  // }
-
   init = () => {
     const filtersFilms = this.filtersFilms;
     const prevFilterComponent = this.#filterComponent;
