@@ -9,7 +9,7 @@ import FilmPopupView from '../view/film-details-view.js';
 import SortView from '../view/sort-view.js';
 import FilmPresenter from './film-presenter.js';
 import {sortFilmByDate, sortFilmByRating, sortFilmByComments} from '../utils/sorting.js';
-import {filterFilms} from '../utils/filter-films.js';
+import {selectedFilter} from '../utils/filter-films.js';
 import {SortType, UpdateType, FilterType, TimeLimit} from '../const.js';
 
 const FILM_COUNT_PER_STEP = 5;
@@ -58,9 +58,9 @@ export default class FilmsPresenter {
   }
 
   get films() {
-    this.#filterType = this.#filterModel.filterFilms;
+    this.#filterType = this.#filterModel.selectedFilter;
     const films = this.#filmsModel.films;
-    const filteredFilms = filterFilms[this.#filterType](films);
+    const filteredFilms = selectedFilter[this.#filterType](films);
 
     switch (this.#currentSortType) {
       case SortType.DATE:
@@ -70,12 +70,6 @@ export default class FilmsPresenter {
     }
 
     return filteredFilms;
-  }
-
-  get countWatchedFilms() {
-    const films = this.#filmsModel.films;
-
-    return filterFilms[FilterType.HISTORY](films).length;
   }
 
   init = () => {
@@ -124,11 +118,14 @@ export default class FilmsPresenter {
   };
 
   #renderProfileButton = () => {
-    if (this.countWatchedFilms === 0) {
+    const films = this.#filmsModel.films;
+    const watchedFilms = selectedFilter[FilterType.HISTORY](films).length;
+
+    if (watchedFilms === 0) {
       return;
     }
 
-    this.#profileButtonView = new ProfileButtonView(this.countWatchedFilms);
+    this.#profileButtonView = new ProfileButtonView(watchedFilms);
 
     render(this.#profileButtonView, siteHeaderElement);
   };
@@ -265,17 +262,17 @@ export default class FilmsPresenter {
 
     if (this.#isLoading) {
       this.#renderLoading();
-      this.#filmsComponent.extraListElements.forEach((item) => item.classList.add('visually-hidden'));
+      this.#filmsComponent.hideExtraList();
       return;
     }
 
     if (filmCount === 0) {
       this.#renderNoFilms();
-      this.#filmsComponent.extraListElements.forEach((item) => item.classList.add('visually-hidden'));
+      this.#filmsComponent.hideExtraList();
       return;
     }
 
-    this.#filmsComponent.extraListElements.forEach((item) => item.classList.remove('visually-hidden'));
+    this.#filmsComponent.showExtraList();
 
     this.#renderProfileButton();
     this.#renderSort();

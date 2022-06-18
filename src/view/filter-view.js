@@ -3,8 +3,8 @@ import AbstractView from '../framework/view/abstract-view.js';
 const createFilterTemplate = (filterItems, currentFilterType) => (
   `<nav class="main-navigation">
     ${filterItems
-    .map((filterFilms) => {
-      const {type, name, count, href} = filterFilms;
+    .map((selectedFilter) => {
+      const {type, name, count, href} = selectedFilter;
       return (
         `<a href="#${href}" class="main-navigation__item ${type === currentFilterType ? 'main-navigation__item--active' : ''}" data-filter-type="${type}">${name} ${type !== 'All' ? `<span class="main-navigation__item-count">${count}</span>` : ''}</a>`
       );

@@ -1,6 +1,6 @@
 import {FilterType} from '../const';
 
-const filterFilms = {
+const selectedFilter = {
   [FilterType.ALL]: (films) => films,
   [FilterType.WATCHLIST]: (films) => films.filter((film) => film.watchlist),
   [FilterType.HISTORY]: (films) => films.filter((film) => film.watched),
@@ -8,4 +8,4 @@ const filterFilms = {
 };
 
 
-export {filterFilms};
+export {selectedFilter};

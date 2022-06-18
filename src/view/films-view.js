@@ -37,4 +37,12 @@ export default class FilmsView extends AbstractView {
   get extraListElements() {
     return this.element.querySelectorAll('.films-list--extra');
   }
+
+  hideExtraList = () => {
+    this.extraListElements.forEach((item) => item.classList.add('visually-hidden'));
+  };
+
+  showExtraList = () => {
+    this.extraListElements.forEach((item) => item.classList.remove('visually-hidden'));
+  };
 }

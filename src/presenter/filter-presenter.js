@@ -1,6 +1,6 @@
 import {render, replace, remove, RenderPosition} from '../framework/render.js';
 import FilterView from '../view/filter-view.js';
-import {filterFilms} from '../utils/filter-films.js';
+import {selectedFilter} from '../utils/filter-films.js';
 import {FilterType, UpdateType} from '../const.js';
 
 export default class FilterPresenter {
@@ -32,19 +32,19 @@ export default class FilterPresenter {
       {
         type: FilterType.WATCHLIST,
         name: 'Watchlist',
-        count: filterFilms[FilterType.WATCHLIST](films).length,
+        count: selectedFilter[FilterType.WATCHLIST](films).length,
         href: 'watchlist',
       },
       {
         type: FilterType.HISTORY,
         name: 'History',
-        count: filterFilms[FilterType.HISTORY](films).length,
+        count: selectedFilter[FilterType.HISTORY](films).length,
         href: 'history',
       },
       {
         type: FilterType.FAVORITES,
         name: 'Favorites',
-        count: filterFilms[FilterType.FAVORITES](films).length,
+        count: selectedFilter[FilterType.FAVORITES](films).length,
         href: 'favorites',
       },
     ];
@@ -54,7 +54,7 @@ export default class FilterPresenter {
     const filtersFilms = this.filtersFilms;
     const prevFilterComponent = this.#filterComponent;
 
-    this.#filterComponent = new FilterView(filtersFilms, this.#filterModel.filterFilms);
+    this.#filterComponent = new FilterView(filtersFilms, this.#filterModel.selectedFilter);
     this.#filterComponent.setFilterTypeChangeHandler(this.#handleFilterTypeChange);
 
     if (prevFilterComponent === null) {
@@ -71,10 +71,10 @@ export default class FilterPresenter {
   };
 
   #handleFilterTypeChange = (filterType) => {
-    if (this.#filterModel.filterFilms === filterType) {
+    if (this.#filterModel.selectedFilter === filterType) {
       return;
     }
 
-    this.#filterModel.setFilterFilms(UpdateType.MAJOR, filterType);
+    this.#filterModel.setSelectedFilter(UpdateType.MAJOR, filterType);
   };
 }
