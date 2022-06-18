@@ -8,7 +8,7 @@ import FilmPopupView from '../view/film-details-view.js';
 import SortView from '../view/sort-view.js';
 import FilmPresenter from './film-presenter.js';
 import {sortFilmByDate, sortFilmByRating, sortFilmByComments} from '../utils/sorting.js';
-import {filter} from '../utils/filter.js';
+import {filterFilms} from '../utils/filter-films.js';
 import {SortType, UpdateType, FilterType, TimeLimit} from '../const.js';
 
 const FILM_COUNT_PER_STEP = 5;
@@ -55,9 +55,9 @@ export default class FilmsPresenter {
   }
 
   get films() {
-    this.#filterType = this.#filterModel.filter;
+    this.#filterType = this.#filterModel.filterFilms;
     const films = this.#filmsModel.films;
-    const filteredFilms = filter[this.#filterType](films);
+    const filteredFilms = filterFilms[this.#filterType](films);
 
     switch (this.#currentSortType) {
       case SortType.DATE:
@@ -231,11 +231,7 @@ export default class FilmsPresenter {
       remove(this.#noFilmComponent);
     }
 
-    if (resetRenderedFilmCount) {
-      this.#renderedFilmCount = FILM_COUNT_PER_STEP;
-    } else {
-      this.#renderedFilmCount = Math.min(filmCount, this.#renderedFilmCount);
-    }
+    this.#renderedFilmCount = resetRenderedFilmCount ? FILM_COUNT_PER_STEP : Math.min(filmCount, this.#renderedFilmCount);
 
     if (resetSortType) {
       this.#currentSortType = SortType.DEFAULT;
@@ -254,6 +250,8 @@ export default class FilmsPresenter {
 
     if (filmCount === 0) {
       this.#renderNoFilms();
+      // remove(this.#filmsComponent.topRatedListElement);
+      // remove(this.#filmsComponent.mostCommentedListElement);
       return;
     }
 
