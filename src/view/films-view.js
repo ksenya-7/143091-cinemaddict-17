@@ -33,4 +33,8 @@ export default class FilmsView extends AbstractView {
   get mostCommentedListElement() {
     return this.element.querySelector('#films-list-most-commented');
   }
+
+  get extraListElements() {
+    return this.element.querySelectorAll('.films-list--extra');
+  }
 }

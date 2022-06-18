@@ -164,7 +164,7 @@ export default class FilmsPresenter {
 
   #renderNoFilms = () => {
     this.#noFilmComponent = new FilmsEmptyView(this.#filterType);
-    render(this.#noFilmComponent, this.#filmsComponent.element, RenderPosition.AFTERBEGIN);
+    render(this.#noFilmComponent, this.#filmsComponent.mainListElement, RenderPosition.AFTERBEGIN);
   };
 
   #renderShowMoreButton = () => {
@@ -250,8 +250,7 @@ export default class FilmsPresenter {
 
     if (filmCount === 0) {
       this.#renderNoFilms();
-      // remove(this.#filmsComponent.topRatedListElement);
-      // remove(this.#filmsComponent.mostCommentedListElement);
+      this.#filmsComponent.extraListElements.forEach((item) => item.classList.add('visually-hidden'));
       return;
     }
 
@@ -290,7 +289,7 @@ export default class FilmsPresenter {
 
     try {
       await this.#filmsModel.updateFilm(
-        UpdateType.MINOR,
+        UpdateType.MAJOR,
         {...film, watched: !film.watched},
       );
 
