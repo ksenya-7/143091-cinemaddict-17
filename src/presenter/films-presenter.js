@@ -1,5 +1,6 @@
 import {render, remove, RenderPosition} from '../framework/render.js';
 import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
+import ProfileButtonView from '../view/profile-button-view.js';
 import FilmsView from '../view/films-view.js';
 import ShowMoreButtonView from '../view/show-more-button-view.js';
 import FilmsEmptyView from '../view/films-empty-view.js';
@@ -14,7 +15,8 @@ import {SortType, UpdateType, FilterType, TimeLimit} from '../const.js';
 const FILM_COUNT_PER_STEP = 5;
 
 const body = document.querySelector('body');
-
+const siteHeaderElement = body.querySelector('.header');
+const siteMainElement = body.querySelector('.main');
 
 export default class FilmsPresenter {
   #filmsContainer = null;
@@ -29,6 +31,7 @@ export default class FilmsPresenter {
   #noFilmComponent = null;
   #sortComponent = null;
   #showMoreButtonComponent = null;
+  #profileButtonView = null;
 
   #renderedFilmCount = FILM_COUNT_PER_STEP;
   #filmPresenter = new Map();
@@ -67,6 +70,12 @@ export default class FilmsPresenter {
     }
 
     return filteredFilms;
+  }
+
+  get countWatchedFilms() {
+    const films = this.#filmsModel.films;
+
+    return filterFilms[FilterType.HISTORY](films).length;
   }
 
   init = () => {
@@ -226,6 +235,7 @@ export default class FilmsPresenter {
     remove(this.#loadingComponent);
     remove(this.#noFilmComponent);
     remove(this.#showMoreButtonComponent);
+    remove(this.#profileButtonView);
 
     if (this.#noFilmComponent) {
       remove(this.#noFilmComponent);
@@ -240,8 +250,9 @@ export default class FilmsPresenter {
 
   #renderBoard = () => {
     const filmCount = this.films.length;
+    this.#profileButtonView = new ProfileButtonView(this.countWatchedFilms);
 
-    render(this.#filmsComponent, this.#filmsContainer);
+    render(this.#filmsComponent, siteMainElement);
 
     if (this.#isLoading) {
       this.#renderLoading();
@@ -255,6 +266,7 @@ export default class FilmsPresenter {
     }
 
     this.#renderSort();
+    render(this.#profileButtonView, siteHeaderElement);
 
     this.#renderFilms(this.films.slice(0, Math.min(filmCount, this.#renderedFilmCount)));
 
@@ -289,7 +301,7 @@ export default class FilmsPresenter {
 
     try {
       await this.#filmsModel.updateFilm(
-        UpdateType.MAJOR,
+        UpdateType.MINOR,
         {...film, watched: !film.watched},
       );
 

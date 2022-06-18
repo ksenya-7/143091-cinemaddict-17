@@ -93,7 +93,7 @@ export default class FilmPresenter {
 
     try {
       await this.#filmsModel.updateFilm(
-        UpdateType.MAJOR,
+        UpdateType.MINOR,
         {...this.#film, watched: !this.#film.watched},
       );
     } catch(err) {
