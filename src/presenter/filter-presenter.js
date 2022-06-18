@@ -52,7 +52,6 @@ export default class FilterPresenter {
 
   get countWatchedFilms() {
     const films = this.#filmsModel.films;
-    console.log(filterFilms[FilterType.HISTORY](films).length);
 
     return filterFilms[FilterType.HISTORY](films).length;
   }
