@@ -283,7 +283,7 @@ export default class FilmPopupView extends AbstractStatefulView {
   };
 
   #commentAddSubmitHandler = (evt) => {
-    if (evt.ctrlKey && evt.key === 'Enter') {
+    if ((evt.metaKey || evt.ctrlKey) && evt.key === 'Enter') {
       this._scrollTop = this.element.scrollTop;
       this._setState({
         isDisabled: true,

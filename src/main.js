@@ -28,6 +28,6 @@ filmsPresenter.init();
 filmsModel.init()
   .finally(() => {
     filterPresenter.init();
-    render(new ProfileButtonView(filmsModel.films), siteHeaderElement);
+    render(new ProfileButtonView(filterPresenter.countWatchedFilms), siteHeaderElement);
     render(new StatisticsView(filmsModel.films), siteFooterElement);
   });

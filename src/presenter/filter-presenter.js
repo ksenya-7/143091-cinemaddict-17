@@ -1,6 +1,6 @@
 import {render, replace, remove, RenderPosition} from '../framework/render.js';
 import FilterView from '../view/filter-view.js';
-import {filter} from '../utils/filter.js';
+import {filterFilms} from '../utils/filter-films.js';
 import {FilterType, UpdateType} from '../const.js';
 
 export default class FilterPresenter {
@@ -19,7 +19,7 @@ export default class FilterPresenter {
     this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
-  get filters() {
+  get filtersFilms() {
     const films = this.#filmsModel.films;
 
     return [
@@ -32,29 +32,36 @@ export default class FilterPresenter {
       {
         type: FilterType.WATCHLIST,
         name: 'Watchlist',
-        count: filter[FilterType.WATCHLIST](films).length,
+        count: filterFilms[FilterType.WATCHLIST](films).length,
         href: 'watchlist',
       },
       {
         type: FilterType.HISTORY,
         name: 'History',
-        count: filter[FilterType.HISTORY](films).length,
+        count: filterFilms[FilterType.HISTORY](films).length,
         href: 'history',
       },
       {
         type: FilterType.FAVORITES,
         name: 'Favorites',
-        count: filter[FilterType.FAVORITES](films).length,
+        count: filterFilms[FilterType.FAVORITES](films).length,
         href: 'favorites',
       },
     ];
   }
 
+  get countWatchedFilms() {
+    const films = this.#filmsModel.films;
+    console.log(filterFilms[FilterType.HISTORY](films).length);
+
+    return filterFilms[FilterType.HISTORY](films).length;
+  }
+
   init = () => {
-    const filters = this.filters;
+    const filtersFilms = this.filtersFilms;
     const prevFilterComponent = this.#filterComponent;
 
-    this.#filterComponent = new FilterView(filters, this.#filterModel.filter);
+    this.#filterComponent = new FilterView(filtersFilms, this.#filterModel.filterFilms);
     this.#filterComponent.setFilterTypeChangeHandler(this.#handleFilterTypeChange);
 
     if (prevFilterComponent === null) {
@@ -71,10 +78,10 @@ export default class FilterPresenter {
   };
 
   #handleFilterTypeChange = (filterType) => {
-    if (this.#filterModel.filter === filterType) {
+    if (this.#filterModel.filterFilms === filterType) {
       return;
     }
 
-    this.#filterModel.setFilter(UpdateType.MAJOR, filterType);
+    this.#filterModel.setFilterFilms(UpdateType.MAJOR, filterType);
   };
 }
