@@ -23,8 +23,8 @@ const filterPresenter = new FilterPresenter(siteMainElement, filterModel, filmsM
 const filmsPresenter = new FilmsPresenter(siteBodyElement, filterModel, filmsModel, commentsModel);
 
 filmsPresenter.init();
+filterPresenter.init();
 filmsModel.init()
   .finally(() => {
-    filterPresenter.init();
     render(new StatisticsView(filmsModel.films), siteFooterElement);
   });

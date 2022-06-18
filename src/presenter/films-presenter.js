@@ -265,6 +265,7 @@ export default class FilmsPresenter {
 
     if (this.#isLoading) {
       this.#renderLoading();
+      this.#filmsComponent.extraListElements.forEach((item) => item.classList.add('visually-hidden'));
       return;
     }
 
@@ -273,6 +274,8 @@ export default class FilmsPresenter {
       this.#filmsComponent.extraListElements.forEach((item) => item.classList.add('visually-hidden'));
       return;
     }
+
+    this.#filmsComponent.extraListElements.forEach((item) => item.classList.remove('visually-hidden'));
 
     this.#renderProfileButton();
     this.#renderSort();
